@@ -1,0 +1,665 @@
+/* ============================================================
+ * COSMOS ATLAS v2 · 08 星系动物园 / 09 极端宇宙 · 章节专属样式
+ * ------------------------------------------------------------
+ * 约定：
+ *   1. 本文件只写 .cz-* 专属类；公共组件类（.panel/.tabs/.tab/
+ *      .btn/.range/.range-row/.range-val/.lightbox/.lightbox-img/
+ *      .lightbox-cap/.legend/.u-mono 等公共类、.ch-widget/.ch-copy/.ch-scrim）
+ *      由 css/main.css 提供，不在此重复定义。
+ *   2. .ch-widget 铺满视口且 pointer-events:none；面板自己
+ *      pointer-events:auto（.panel 公共类已提供），否则会盖住
+ *      canvas 拖拽。
+ *   3. 只用 §2.1 token / rgba(0,0,0,.x) / rgba(255,255,255,.x)；
+ *      圆角 0；动效落在 120/200/320/480ms + 两条缓动内。
+ * ============================================================ */
+
+/* ============================================================
+ * 一、控制面板：08 右下角 / 09 右侧垂直居中
+ * ============================================================ */
+.cz-panel {
+  position: absolute;
+  right: clamp(20px, 4.5vw, 72px);
+  bottom: clamp(20px, 6vh, 72px);
+  z-index: 4;
+  width: min(372px, 92vw);
+  max-height: min(76vh, 760px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+}
+
+.cz-panel::-webkit-scrollbar { width: 6px; }
+.cz-panel::-webkit-scrollbar-track { background: transparent; }
+.cz-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+}
+
+/* 09 极端宇宙：面板在右侧、场景主体偏左 */
+.cz-panel--extreme {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: min(404px, 92vw);
+  max-height: min(82vh, 820px);
+}
+
+/* 面板内垂直节奏 */
+.cz-panel > * + * { margin-top: var(--s2); }
+.cz-mode > * + * { margin-top: var(--s2); }
+
+/* tabs 紧贴面板上沿时压缩下边距 */
+.cz-tabs { margin-bottom: 0; }
+.cz-panel .tabs + * { margin-top: var(--s2); }
+
+/* ============================================================
+ * 二、08 星系动物园：代表星系 / 数据卡 / 画廊
+ * ============================================================ */
+
+/* ----- 代表星系（整块按钮，点开灯箱） ----- */
+.cz-feat {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cz-feat-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: var(--carbon-90);
+  border: 1px solid var(--line);
+}
+
+.cz-feat-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.94;
+  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-4) var(--ease-out);
+}
+
+.cz-feat.is-hover .cz-feat-img { opacity: 1; transform: scale(1.02); }
+
+.cz-noimg {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: 0.16em;
+  color: var(--fg-3);
+  background: var(--carbon-90);
+}
+
+.cz-feat-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--spacesuit-white);
+}
+
+.cz-feat-en {
+  margin: 2px 0 0;
+  font-size: var(--fs-12);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.cz-feat-meta {
+  margin: 6px 0 0;
+  font-size: var(--fs-12);
+  line-height: 1.5;
+  color: var(--fg-3);
+}
+
+.cz-feat[disabled] { cursor: default; }
+.cz-feat[disabled] .cz-feat-img { opacity: 0.5; }
+
+/* ----- 数据卡（4 格网格） ----- */
+.cz-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.cz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--carbon-90);
+}
+
+.cz-stat-l {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg-3);
+}
+
+.cz-stat-v {
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--spacesuit-white);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----- 照片画廊（缩略图网格） ----- */
+.cz-gallery-head {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.cz-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.cz-thumb {
+  position: relative;
+  display: block;
+  padding: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--carbon-90);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.cz-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.84;
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-out);
+}
+
+.cz-thumb:hover img,
+.cz-thumb:focus-visible img { opacity: 1; transform: scale(1.04); }
+
+.cz-thumb.is-miss img { display: none; }
+.cz-thumb.is-miss::after {
+  content: "无图";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
+}
+
+/* ----- 操作提示 ----- */
+.cz-hint {
+  margin: 0;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-12);
+  line-height: 1.6;
+  color: var(--fg-3);
+}
+
+/* ============================================================
+ * 三、09 极端宇宙：模式块 / 滑杆 / 读数 / 曲线 / 照片 / 短文
+ * ============================================================ */
+
+/* 三个模式叠在同一格里交叉淡化；容器高度由 JS 平滑过渡，切换不跳
+   （构建期全部建好，切换只改透明度 / 可见性） */
+.cz-modes {
+  position: relative;
+  overflow: hidden;
+  transition: height 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cz-mode {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition:
+    opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 200ms;
+}
+
+.cz-mode.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s;
+}
+
+/* ----- 滑杆行 ----- */
+.cz-range-row { align-items: center; }
+.cz-range-label {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.cz-range { flex: 1 1 auto; width: auto; min-width: 0; }
+.cz-range-val {
+  flex: none;
+  min-width: 96px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  text-align: right;
+  color: var(--nasa-blue-tint);
+  font-variant-numeric: tabular-nums;
+}
+.cz-range-val sup { font-size: 0.72em; vertical-align: super; line-height: 0; }
+
+.cz-range-note {
+  margin: 0;
+  font-size: var(--fs-12);
+  line-height: 1.65;
+  color: var(--fg-3);
+}
+
+/* ----- 公式条（哈勃定律） ----- */
+.cz-formula {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+}
+.cz-formula sub { font-size: 0.72em; vertical-align: sub; }
+
+/* ----- 数据读数（来自 COSMOS.DATA.deepObjects） ----- */
+.cz-readout {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+
+.cz-readout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s2);
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cz-readout-l {
+  margin: 0;
+  font-size: var(--fs-12);
+  line-height: 1.5;
+}
+
+.cz-readout-v {
+  margin: 0;
+  flex: none;
+  max-width: 62%;
+  text-align: right;
+  font-size: var(--fs-12);
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+}
+
+/* ----- 暗物质旋转曲线（静态 SVG） ----- */
+.cz-curve-wrap {
+  padding: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cz-curve { display: block; width: 100%; height: auto; }
+
+.cz-curve-grid line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 1; }
+.cz-curve-grid text {
+  fill: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.cz-curve .axis { stroke: rgba(255, 255, 255, 0.36); stroke-width: 1; }
+
+.cz-curve-obs {
+  fill: none;
+  stroke: var(--spacesuit-white);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.cz-curve-vis {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.42);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+  stroke-linejoin: round;
+}
+
+/* 暗物质 NFW 晕的预测曲线（随 M200 变化） */
+.cz-curve-nfw {
+  fill: none;
+  stroke: var(--nasa-blue-tint);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+/* 暗能量：膨胀速率曲线与当前尺度点 */
+.cz-curve-acc {
+  fill: none;
+  stroke: var(--nasa-blue-tint);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.cz-curve-dot {
+  fill: var(--spacesuit-white);
+  stroke: rgba(0, 0, 0, 0.85);
+  stroke-width: 1.5;
+}
+
+.cz-curve-ax {
+  fill: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+/* ----- 图例（公共 .legend 提供排版，这里只补色标） ----- */
+.cz-legend { margin: 0; }
+.cz-legend-item { font-size: var(--fs-12); }
+.cz-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  flex: none;
+  background: var(--spacesuit-white);
+}
+.cz-legend-swatch.is-vis { background: rgba(255, 255, 255, 0.42); }
+.cz-legend-swatch.is-nfw { background: var(--nasa-blue-tint); }
+.cz-legend-swatch.is-slow { background: rgba(255, 255, 255, 0.42); }
+.cz-legend-swatch.is-acc { background: var(--nasa-blue-tint); }
+
+/* 竖向图例（三条曲线时用） */
+.cz-legend-col {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* ----- 照片按钮 ----- */
+.cz-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--carbon-90);
+  cursor: pointer;
+}
+
+.cz-photo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+
+.cz-photo:hover .cz-photo-img,
+.cz-photo:focus-visible .cz-photo-img { opacity: 1; }
+
+.cz-photo-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 6px 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--fg-2);
+  text-align: left;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.cz-photo.is-miss .cz-photo-img { visibility: hidden; }
+.cz-photo.is-miss::after {
+  content: "图像暂时不可用";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
+}
+
+/* ----- 开关按钮（暗物质晕） ----- */
+.cz-toggle { align-self: flex-start; }
+.cz-toggle[aria-pressed="true"] {
+  border-color: var(--nasa-blue);
+  color: var(--spacesuit-white);
+}
+
+/* ----- 「这意味着什么」短文 ----- */
+/* ----- 参数读数行（滑杆旁的派生量） ----- */
+.cz-param-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s2);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cz-param-k {
+  font-size: var(--fs-12);
+  line-height: 1.5;
+}
+
+.cz-param-v {
+  font-size: var(--fs-12);
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+  white-space: nowrap;
+}
+
+/* ----- 两个开关并排 ----- */
+.cz-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cz-note {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--line-strong);
+  font-size: var(--fs-14);
+  line-height: 1.7;
+  color: var(--fg-2);
+}
+
+/* ============================================================
+ * 四、共享灯箱（08 / 09 共用）
+ * 结构：.lightbox.cz-lightbox > [关闭][上一张] figure.cz-lb-fig
+ *        > img.lightbox-img.cz-lb-img + .lightbox-cap.cz-lb-cap
+ *        + [下一张]；显示/隐藏由 hidden 属性控制（main.css 约定）。
+ * ============================================================ */
+.cz-lightbox { z-index: 120; }
+
+.cz-lb-fig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  width: 100%;
+  margin: 0;
+}
+
+.cz-lb-img {
+  display: block;
+  max-width: 100%;
+  max-height: 66vh;
+  object-fit: contain;
+  background: var(--carbon-90);
+}
+
+.cz-lb-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 60em;
+  text-align: left;
+}
+
+.cz-lb-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--spacesuit-white);
+}
+
+.cz-lb-meta {
+  margin: 0;
+  font-size: var(--fs-12);
+  letter-spacing: 0.06em;
+  color: var(--nasa-blue-tint);
+}
+
+.cz-lb-note {
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 1.65;
+  color: var(--fg-2);
+}
+
+.cz-lb-close {
+  position: absolute;
+  top: var(--s3);
+  right: var(--s3);
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.cz-lb-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  justify-content: center;
+  width: 46px;
+  height: 58px;
+  padding: 0;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.55);
+}
+.cz-lb-nav.is-prev { left: var(--s3); }
+.cz-lb-nav.is-next { right: var(--s3); }
+
+.cz-lightbox.is-miss .cz-lb-img { visibility: hidden; }
+
+/* ============================================================
+ * 五、键盘焦点（局部补充，不覆盖全局 focus-visible）
+ * ============================================================ */
+.cz-feat:focus-visible,
+.cz-thumb:focus-visible,
+.cz-photo:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+ * 六、响应式
+ * ============================================================ */
+@media (max-width: 1180px) {
+  .cz-panel { width: min(344px, 90vw); }
+  .cz-panel--extreme { width: min(372px, 90vw); }
+}
+
+@media (max-width: 900px) {
+  .cz-panel,
+  .cz-panel--extreme {
+    top: auto;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    width: auto;
+    max-height: 54vh;
+    transform: none;
+  }
+  .cz-panel--extreme { max-height: 58vh; }
+  .cz-gallery { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .cz-panel,
+  .cz-panel--extreme {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    max-height: 50vh;
+    padding: var(--s2);
+  }
+  .cz-panel--extreme { max-height: 54vh; }
+  .cz-gallery { grid-template-columns: repeat(4, 1fr); }
+  .cz-lb-img { max-height: 52vh; }
+  .cz-lb-close { top: 8px; right: 8px; }
+  .cz-lb-nav { width: 38px; height: 46px; }
+  .cz-lb-nav.is-prev { left: 8px; }
+  .cz-lb-nav.is-next { right: 8px; }
+  .cz-lb-note { font-size: var(--fs-12); }
+}
+
+/* ============================================================
+ * 七、减少动态
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .cz-panel *,
+  .cz-lightbox * {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+  .cz-feat.is-hover .cz-feat-img,
+  .cz-thumb:hover img,
+  .cz-thumb:focus-visible img { transform: none; }
+}

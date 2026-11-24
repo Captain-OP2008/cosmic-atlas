@@ -1,0 +1,1104 @@
+/* ============================================================
+ * COSMOS ATLAS · css/solar.css
+ * 02 太阳系 / 03 行星对比
+ * ------------------------------------------------------------
+ * 只用 AGENTS.md §2.1 的 token 与 §2.2 字体字号阶；
+ * 圆角 0/2px，无胶囊、无玻璃拟态、无彩色霓虹。
+ * 公共类（.btn/.tabs/.drawer/.chip/.panel/.stat/.bar-* 等）在这里
+ * 按作用域补一层结构兜底；若 main.css 补齐同名类，样式仍由本文件
+ * 在模块作用域内接管，不影响其它章节。
+ * ============================================================ */
+
+/* ---------------- 作用域公共件 ---------------- */
+.sol-ui .btn,
+.solar-console .btn,
+.cmp-lab .btn,
+#sol-drawer .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 9px 18px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--nasa-blue, #1C67E3);
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              border-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+.sol-ui .btn:hover,
+.solar-console .btn:hover,
+.cmp-lab .btn:hover,
+#sol-drawer .btn:hover {
+  background: var(--nasa-blue-tint, #288BFF);
+}
+
+.sol-ui .btn:active,
+.solar-console .btn:active,
+.cmp-lab .btn:active,
+#sol-drawer .btn:active {
+  transform: translateY(1px);
+}
+
+.sol-ui .btn.is-ghost,
+.solar-console .btn.is-ghost,
+.cmp-lab .btn.is-ghost,
+#sol-drawer .btn.is-ghost {
+  background: transparent;
+  border-color: var(--carbon-60, #58585B);
+  color: var(--spacesuit-white, #fff);
+}
+
+.sol-ui .btn.is-ghost:hover,
+.solar-console .btn.is-ghost:hover,
+.cmp-lab .btn.is-ghost:hover,
+#sol-drawer .btn.is-ghost:hover {
+  border-color: var(--nasa-blue-tint, #288BFF);
+  color: var(--spacesuit-white, #fff);
+}
+
+.sol-ui .btn.is-ghost.is-on,
+.solar-console .btn.is-ghost.is-on,
+  background: var(--nasa-blue, #1C67E3);
+  border-color: var(--nasa-blue, #1C67E3);
+}
+
+.sol-ui .btn.is-small,
+.solar-console .btn.is-small,
+.cmp-lab .btn.is-small,
+#sol-drawer .btn.is-small {
+  min-height: 32px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.sol-ui .btn:focus-visible,
+.solar-console .btn:focus-visible,
+.cmp-lab .btn:focus-visible,
+#sol-drawer .btn:focus-visible,
+.sol-ui :focus-visible,
+.solar-console :focus-visible,
+.cmp-lab :focus-visible,
+  outline: 2px solid var(--nasa-blue-tint, #288BFF);
+  outline-offset: 2px;
+}
+
+/* 兜底语义类 */
+.solar-console .u-kicker,
+.cmp-lab .u-kicker,
+#sol-drawer .u-kicker {
+  margin: 0;
+  font-family: var(--font-mono, "DM Mono", monospace);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-console .u-mono,
+.cmp-lab .u-mono,
+#sol-drawer .u-mono {
+  font-family: var(--font-mono, "DM Mono", monospace);
+}
+
+.solar-console .u-dim,
+.cmp-lab .u-dim,
+#sol-drawer .u-dim {
+  color: var(--carbon-40, #959599);
+}
+
+.sol-ui .legend,
+.cmp-lab .legend,
+#sol-drawer .legend {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sol-ui .legend-item,
+.cmp-lab .legend-item,
+#sol-drawer .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* range 兜底（深色轨道，NASA 蓝滑钮） */
+.solar-console .range,
+.cmp-lab .range,
+#sol-drawer .range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--nasa-blue, #1C67E3);
+}
+
+.solar-console .range::-webkit-slider-runnable-track,
+.cmp-lab .range::-webkit-slider-runnable-track,
+#sol-drawer .range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--carbon-60, #58585B);
+}
+
+.solar-console .range::-moz-range-track,
+.cmp-lab .range::-moz-range-track,
+#sol-drawer .range::-moz-range-track {
+  height: 2px;
+  background: var(--carbon-60, #58585B);
+}
+
+.solar-console .range::-webkit-slider-thumb,
+.cmp-lab .range::-webkit-slider-thumb,
+#sol-drawer .range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border: 0;
+  border-radius: 0;
+  background: var(--nasa-blue-tint, #288BFF);
+}
+
+.solar-console .range::-moz-range-thumb,
+.cmp-lab .range::-moz-range-thumb,
+#sol-drawer .range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 0;
+  background: var(--nasa-blue-tint, #288BFF);
+}
+
+.solar-console .range-row,
+.cmp-lab .range-row,
+#sol-drawer .range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.solar-console .range-val,
+.cmp-lab .range-val,
+#sol-drawer .range-val {
+  flex: none;
+  min-width: 84px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--spacesuit-white, #fff);
+  text-align: right;
+}
+
+/* ---------------- 03 太阳系 · widget ---------------- */
+.ch-solar .ch-widget,
+.ch-compare .ch-widget {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.sol-ui.solar-ui {
+  width: 100%;
+  max-width: 560px;
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+}
+
+.solar-console {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--carbon-70, #444447);
+  border-radius: 0;
+  background: var(--carbon-90, #17171B);
+}
+
+.solar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.solar-row-speed {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--carbon-80, #2E2E32);
+}
+
+.solar-speed {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.solar-speed-label {
+  flex: none;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-row .range-val {
+  color: var(--spacesuit-white, #fff);
+}
+
+.solar-row-toggles {
+  gap: 8px;
+}
+
+.solar-play {
+  min-width: 76px;
+}
+
+.solar-zoom {
+  min-width: 34px;
+  padding-left: 0;
+  padding-right: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.solar-compare {
+  margin-left: auto;
+}
+
+.solar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.solar-chips .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--carbon-70, #444447);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.38);
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              background-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+.solar-chips .chip:hover,
+.solar-chips .chip.is-hot {
+  border-color: var(--nasa-blue-tint, #288BFF);
+  background: rgba(28, 103, 227, 0.22);
+}
+
+.solar-chips .chip.is-active,
+.solar-chips .chip[aria-pressed="true"] {
+  border-color: var(--nasa-blue, #1C67E3);
+  background: var(--nasa-blue-shade, #0B3D91);
+}
+
+.solar-chip-sym {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-chip.is-active .solar-chip-sym,
+.solar-chip.is-hot .solar-chip-sym {
+  color: var(--spacesuit-white, #fff);
+}
+
+.solar-chip-name {
+  line-height: 1;
+}
+
+.solar-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.solar-hint {
+  margin: 4px 0 0;
+  font-family: var(--font-mono, "DM Mono", monospace);
+  font-size: 10.5px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------- 03 太阳系 · 3D 标签层 ---------------- */
+#sol-labels.sol-labels {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 200ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+#sol-labels.sol-labels.is-dim {
+  opacity: 0.18;
+}
+
+.sol-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  white-space: nowrap;
+  will-change: transform;
+  transition: opacity 120ms linear, border-color 120ms linear, background-color 120ms linear;
+}
+
+.sol-label.is-off {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.sol-label.is-hot {
+  border-color: var(--nasa-blue-tint, #288BFF);
+  background: rgba(11, 61, 145, 0.72);
+}
+
+.sol-label.is-active {
+  border-color: var(--nasa-blue, #1C67E3);
+  background: var(--nasa-blue-shade, #0B3D91);
+}
+
+.sol-label-dot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--nasa-blue-tint, #288BFF);
+}
+
+.sol-label-name {
+  font-weight: 600;
+}
+
+/* ---------------- 03 太阳系 · 抽屉 ---------------- */
+#sol-scrim.sol-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.66);
+}
+
+#sol-scrim.sol-scrim[hidden],
+#sol-drawer[hidden] {
+  display: none;
+}
+
+#sol-drawer.solar-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: block;
+  width: min(460px, 94vw);
+  max-width: 100%;
+  background: var(--carbon-black, #000);
+  border-left: 1px solid var(--carbon-70, #444447);
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  overflow: hidden;
+  animation: sol-drawer-in 320ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+@keyframes sol-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.solar-drawer-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.solar-drawer-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--carbon-80, #2E2E32);
+  background: var(--carbon-black, #000);
+}
+
+.solar-drawer-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 6px 0 0;
+  font-family: var(--font-display, "Public Sans", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.solar-drawer-name {
+  color: var(--spacesuit-white, #fff);
+}
+
+.solar-drawer-en {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-drawer .drawer-close {
+  flex: none;
+  margin-top: 4px;
+}
+
+.solar-drawer-body {
+  padding: 18px 20px 32px;
+}
+
+.solar-drawer-top {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.solar-thumb {
+  flex: none;
+  width: 132px;
+  aspect-ratio: 1;
+  margin: 0;
+  border: 1px solid var(--carbon-80, #2E2E32);
+  border-radius: 50%;
+  background-color: var(--carbon-90, #17171B);
+  background-repeat: no-repeat;
+  background-position: center;
+  /* 等距柱状贴图取中间 50% → 小尺寸下近似一张圆盘，再用内阴影做出球面明暗 */
+  background-size: 200% 100%;
+  box-shadow: inset -22px -16px 34px rgba(0, 0, 0, 0.72),
+              inset 10px 10px 26px rgba(255, 255, 255, 0.06);
+}
+
+.solar-drawer-intro {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.solar-tagline {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.solar-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin: 0;
+}
+
+.solar-stats .stat {
+  min-width: 0;
+  margin: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--carbon-80, #2E2E32);
+}
+
+.solar-stats .stat-l {
+  margin: 0;
+  font-family: var(--font-mono, "DM Mono", monospace);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-stats .solar-stat-val {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 2px 0 0;
+  white-space: nowrap;
+}
+
+.solar-stats .stat-v {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.solar-stats .stat-u {
+  font-size: 11px;
+  color: var(--carbon-40, #959599);
+}
+
+.solar-brief {
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--carbon-20, #D1D1D1);
+}
+
+.solar-special {
+  margin: 10px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--nasa-blue, #1C67E3);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--spacesuit-white, #fff);
+}
+
+.solar-atmo {
+  margin-top: 22px;
+}
+
+.solar-atmo .u-kicker {
+  margin: 0 0 10px;
+}
+
+.solar-atmo-bar {
+  display: flex;
+  width: 100%;
+  height: 14px;
+  border: 1px solid var(--carbon-70, #444447);
+  background: var(--carbon-90, #17171B);
+  overflow: hidden;
+}
+
+.solar-atmo-seg {
+  display: block;
+  height: 100%;
+  min-width: 1px;
+}
+
+.solar-atmo-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+
+.solar-atmo-legend .legend-item {
+  gap: 7px;
+}
+
+.solar-atmo-swatch {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.solar-atmo-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--carbon-20, #D1D1D1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.solar-atmo-pct {
+  flex: none;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--spacesuit-white, #fff);
+}
+
+.solar-atmo-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ---------------- 04 对比实验室 ---------------- */
+.cmp-lab {
+  width: 100%;
+  max-width: 100%;
+  color: var(--spacesuit-white, #fff);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+}
+
+.ch-compare .ch-inner .ch-widget {
+  max-width: 680px;
+}
+
+.cmp-head {
+  margin-bottom: 12px;
+}
+
+.cmp-guide {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cmp-tabs.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--carbon-70, #444447);
+  margin-bottom: 16px;
+}
+
+.cmp-tab.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--carbon-40, #959599);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              border-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+.cmp-tab.tab small {
+  font-family: var(--font-mono, "DM Mono", monospace);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--carbon-50, #717173);
+}
+
+.cmp-tab.tab:hover {
+  color: var(--spacesuit-white, #fff);
+}
+
+.cmp-tab.tab.is-on {
+  color: var(--spacesuit-white, #fff);
+  border-bottom-color: var(--nasa-blue, #1C67E3);
+}
+
+.cmp-tab.tab.is-on small {
+  color: var(--nasa-blue-tint, #288BFF);
+}
+
+.cmp-panels {
+  position: relative;
+}
+
+.cmp-panel[hidden] {
+  display: none;
+}
+
+.cmp-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cmp-planets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cmp-planets .cmp-chip {
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid var(--carbon-70, #444447);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.42);
+  color: var(--carbon-20, #D1D1D1);
+  font-family: var(--font-ui, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)),
+              background-color 120ms var(--ease-out, cubic-bezier(.16, 1, .3, 1));
+}
+
+.cmp-planets .cmp-chip:hover {
+  border-color: var(--nasa-blue-tint, #288BFF);
+  color: var(--spacesuit-white, #fff);
+}
+
+.cmp-planets .cmp-chip.is-on {
+  border-color: var(--nasa-blue, #1C67E3);
+  background: var(--nasa-blue-shade, #0B3D91);
+  color: var(--spacesuit-white, #fff);
+}
+
+/* 大小 */
+.cmp-size {
+  margin: 0;
+  padding: 8px 0 0;
+  border: 1px solid var(--carbon-80, #2E2E32);
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.cmp-size-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+}
+
+.cmp-circle {
+  stroke-width: 1;
+}
+
+.cmp-circle-earth {
+  fill: rgba(28, 103, 227, 0.55);
+  stroke: var(--nasa-blue-tint, #288BFF);
+}
+
+.cmp-circle-other {
+  fill: rgba(185, 185, 187, 0.2);
+  stroke: var(--carbon-40, #959599);
+}
+
+.cmp-circle-label {
+  fill: var(--spacesuit-white, #fff);
+  font-family: var(--font-display, "Public Sans", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.cmp-circle-sub {
+  fill: var(--carbon-40, #959599);
+  font-family: var(--font-mono, "DM Mono", monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.cmp-size-cap {
+  margin: 0;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--carbon-80, #2E2E32);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--carbon-20, #D1D1D1);
+}
+
+/* 重力 */
+.cmp-mass-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--carbon-80, #2E2E32);
+  background: rgba(0, 0, 0, 0.34);
+  font-size: 12px;
+  color: var(--carbon-40, #959599);
+}
+
+.cmp-mass-row > label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cmp-mass-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--spacesuit-white, #fff);
+}
+
+.cmp-mass-input {
+  width: 78px;
+  height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--carbon-60, #58585B);
+  border-radius: 2px;
+  background: var(--carbon-black, #000);
+  color: var(--spacesuit-white, #fff);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-mass-input:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint, #288BFF);
+  outline-offset: 1px;
+}
+
+.cmp-mass-hint {
+  flex: 1 1 200px;
+  min-width: 0;
+  font-size: 11px;
+}
+
+.cmp-g-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--carbon-50, #717173);
+}
+
+.cmp-g-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cmp-g-row.bar-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 92px minmax(120px, auto);
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.cmp-g-name {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--carbon-20, #D1D1D1);
+}
+
+.cmp-g-row.is-earth .cmp-g-name {
+  color: var(--nasa-blue-tint, #288BFF);
+}
+
+.cmp-g-track.bar-track {
+  height: 8px;
+  background: var(--carbon-80, #2E2E32);
+  overflow: hidden;
+}
+
+.cmp-g-fill.bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--carbon-40, #959599);
+}
+
+.cmp-g-row.is-earth .cmp-g-fill {
+  background: var(--nasa-blue, #1C67E3);
+}
+
+.cmp-g-val {
+  font-size: 11px;
+  color: var(--carbon-30, #B9B9BB);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cmp-g-weight {
+  font-size: 11px;
+  color: var(--spacesuit-white, #fff);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cmp-g-sum {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--nasa-blue, #1C67E3);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--spacesuit-white, #fff);
+}
+
+.cmp-g-note {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* 大气 */
+.cmp-atmo-title {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--carbon-40, #959599);
+}
+
+.cmp-atmo-bar {
+  display: flex;
+  width: 100%;
+  height: 22px;
+  border: 1px solid var(--carbon-70, #444447);
+  background: var(--carbon-90, #17171B);
+  overflow: hidden;
+}
+
+.cmp-atmo-seg {
+  display: block;
+  height: 100%;
+  min-width: 1px;
+}
+
+.cmp-atmo-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 14px;
+}
+
+.cmp-atmo-legend .legend-item {
+  gap: 7px;
+}
+
+.cmp-atmo-swatch {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.cmp-atmo-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--carbon-20, #D1D1D1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-atmo-pct {
+  flex: none;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--spacesuit-white, #fff);
+}
+
+.cmp-atmo-note {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--carbon-80, #2E2E32);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.cmp-atmo-facts {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 1080px) {
+  .ch-compare .ch-inner .ch-widget {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  .sol-ui.solar-ui {
+    max-width: 100%;
+  }
+  .solar-console {
+    padding: 12px;
+  }
+  .solar-row-toggles {
+    gap: 6px;
+  }
+  .solar-compare {
+    margin-left: 0;
+  }
+  .solar-chips {
+    gap: 6px;
+  }
+  .solar-drawer-top {
+    flex-direction: column;
+  }
+  .solar-thumb {
+    width: 96px;
+  }
+  .solar-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .solar-atmo-legend {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #sol-drawer.solar-drawer {
+    width: 100%;
+    border-left: 0;
+  }
+  .cmp-mass-hint {
+    flex-basis: 100%;
+  }
+  .cmp-g-row.bar-row {
+    grid-template-columns: 48px minmax(0, 1fr) 78px;
+    grid-template-areas:
+      "name track val"
+      ". weight weight";
+    row-gap: 3px;
+  }
+  .cmp-g-name { grid-area: name; }
+  .cmp-g-track { grid-area: track; }
+  .cmp-g-val { grid-area: val; }
+  .cmp-g-weight { grid-area: weight; text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sol-drawer.solar-drawer {
+    animation: none;
+  }
+  .solar-console .btn,
+  .cmp-lab .btn,
+  .cmp-tab.tab,
+  .cmp-planets .cmp-chip,
+  .solar-chips .chip,
+  .sol-label {
+    transition: none;
+  }
+}
+
+/* ---------- 集成修：抽屉头部挤压（标题被压成竖排）与长数值溢出 ---------- */
+.solar-drawer-head { flex-wrap: wrap; }
+.solar-drawer-head > .u-kicker { flex: 1 0 100%; }
+.solar-drawer-head > .solar-drawer-title { flex: 1 1 auto; min-width: 0; }
+.solar-drawer-head > .drawer-close { flex: none; }
+.solar-stats .solar-stat-val { white-space: normal; flex-wrap: wrap; row-gap: 2px; }
+.solar-stats .stat-v { font-size: 16px; }

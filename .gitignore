@@ -1,0 +1,21 @@
+# 验收截图与开发临时产物（体积大，不利于仓库）
+shots/
+artifacts/
+.playwright-mcp/
+
+# 本地存档备份（GitHub 提交历史已保留）
+.backup-v1/
+.backup-v3-prestellar/
+
+# 依赖
+node_modules/
+
+# Windows 误建的系统设备名文件
+NUL
+
+# 系统 / 编辑器
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

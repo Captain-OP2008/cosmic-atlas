@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="description" content="COSMOS ATLAS · 宇宙图谱 —— 从太阳系到可观测宇宙边缘的沉浸式天文图谱。3D 太阳系、行星对比、黑洞、恒星一生、星系动物园、航天史与未来计划。" />
+<title>COSMOS ATLAS · 宇宙图谱</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23fff'/%3E%3Ccircle cx='25' cy='9' r='2' fill='%231C67E3'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/solar.css" />
+<link rel="stylesheet" href="css/deep.css" />
+<link rel="stylesheet" href="css/cosmos.css" />
+<link rel="stylesheet" href="css/human.css" />
+</head>
+<body>
+
+<!-- ============ 跳到正文 ============ -->
+<a class="skip-link" href="#scroll">跳到正文</a>
+
+<!-- ============ WebGL 画布 ============ -->
+<canvas id="gl" aria-label="宇宙场景实时渲染画布"></canvas>
+
+<!-- ============ 全屏质感层：只保留暗角 + 轻颗粒 ============ -->
+<div class="fx-layer fx-vignette" aria-hidden="true"></div>
+<div class="fx-layer fx-grain" aria-hidden="true"></div>
+
+<!-- ============ 载入屏 ============ -->
+<div id="loader" class="loader">
+  <div class="loader-inner">
+    <div class="loader-mark">
+      <span class="loader-ring"></span>
+      <span class="loader-ring loader-ring-2"></span>
+    </div>
+    <div class="loader-title">COSMOS<em>ATLAS</em></div>
+    <div class="loader-sub">宇宙图谱 · 从太阳系到可观测宇宙边缘</div>
+    <div class="loader-bar"><span id="loader-bar-fill"></span></div>
+    <div class="loader-hint" id="loader-hint">正在绘制星空…</div>
+  </div>
+</div>
+
+<!-- ============ 章节转场 ============ -->
+<div id="warp" class="warp" aria-hidden="true">
+  <div class="warp-horizon"></div>
+  <div class="warp-label">
+    <span class="warp-num" id="warp-num"></span>
+    <span class="warp-name" id="warp-name"></span>
+  </div>
+</div>
+
+<!-- ============ 章节切换幕布：四色斜向条纹 ============ -->
+<div id="curtain" class="curtain" aria-hidden="true">
+  <i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i>
+</div>
+
+<!-- ============ HUD ============ -->
+<header class="hud">
+  <a class="brand" href="#ch-hero" data-goto="0" aria-label="回到序章">
+    <span class="brand-dot"></span>
+    <span class="brand-txt">COSMOS<em>ATLAS</em></span>
+  </a>
+  <div class="hud-right">
+    <span class="hud-part" id="hud-part">序章</span>
+    <span class="hud-sep"></span>
+    <span class="hud-coord" id="hud-coord">RA 00h00m · DEC +00°00′</span>
+    <span class="hud-sep"></span>
+    <span class="hud-chapter" id="hud-chapter">00 / 12</span>
+  </div>
+</header>
+
+<!-- ============ 章节导航 ============ -->
+<nav id="nav" class="nav" aria-label="章节导航"></nav>
+
+<!-- ============ 滚动进度 ============ -->
+<div class="rail" aria-hidden="true"><div class="rail-fill" id="rail-fill"></div></div>
+
+<!-- ============ 主滚动容器 ============ -->
+<main id="scroll" tabindex="-1">
+
+  <!-- 序章 -->
+  <section class="chapter ch-hero" data-stage="hero" data-num="00" data-name="宇宙" data-en="THE UNIVERSE"
+           data-part="序章" data-h="100" data-coord="RA 00h00m · DEC +00°00′" id="ch-hero"></section>
+
+  <!-- I · 宇宙 -->
+  <section class="chapter ch-overview" data-stage="overview" data-num="01" data-name="宇宙总览" data-en="THE COSMOS"
+           data-part="I · 宇宙" data-h="200" data-coord="RA 03h32m · DEC −27°48′" id="ch-overview"></section>
+
+  <!-- II · 太阳系 -->
+  <section class="chapter ch-solar" data-stage="solar" data-num="02" data-name="太阳系" data-en="SOLAR SYSTEM"
+           data-part="II · 太阳系" data-h="320" data-coord="RA 00h42m · DEC +41°16′" id="ch-solar"></section>
+
+  <section class="chapter ch-compare" data-stage="idle" data-num="03" data-name="行星对比" data-en="COMPARE"
+           data-part="II · 太阳系" data-h="200" data-coord="RA 12h00m · DEC +00°00′" id="ch-compare"></section>
+
+  <!-- III · 深空天体 -->
+  <section class="chapter ch-compact" data-stage="compact" data-num="04" data-name="致密天体" data-en="COMPACT OBJECTS"
+           data-part="III · 深空天体" data-h="260" data-coord="RA 17h45m · DEC −29°00′" id="ch-compact"></section>
+
+  <!-- IV · 宇宙深处 -->
+
+  <section class="chapter ch-galaxies" data-stage="galaxies" data-num="05" data-name="星系动物园" data-en="GALAXY ZOO"
+           data-part="IV · 宇宙深处" data-h="260" data-coord="RA 13h29m · DEC +47°11′" id="ch-galaxies"></section>
+
+  <section class="chapter ch-extreme" data-stage="extreme" data-num="06" data-name="极端宇宙" data-en="EXTREME COSMOS"
+           data-part="IV · 宇宙深处" data-h="280" data-coord="RA 12h57m · DEC +22°01′" id="ch-extreme"></section>
+
+  <!-- V · 人类探索 -->
+  <section class="chapter ch-history" data-stage="explore1" data-num="07" data-name="航天里程碑" data-en="SPACE AGE"
+           data-part="V · 人类探索" data-h="300" data-coord="RA 00h00m · DEC +00°00′" id="ch-history"></section>
+
+  <section class="chapter ch-vehicles" data-stage="explore2" data-num="08" data-name="现役与未来载具" data-en="VEHICLES"
+           data-part="V · 人类探索" data-h="260" data-coord="RA 06h45m · DEC −16°42′" id="ch-vehicles"></section>
+
+  <section class="chapter ch-future" data-stage="explore3" data-num="09" data-name="未来计划" data-en="WHAT'S NEXT"
+           data-part="V · 人类探索" data-h="240" data-coord="RA 22h57m · DEC −29°37′" id="ch-future"></section>
+
+  <!-- 终章 -->
+  <section class="chapter ch-finale" data-stage="nebula" data-num="10" data-name="暗淡蓝点" data-en="PALE BLUE DOT"
+           data-part="终章" data-h="100" data-coord="RA 16h04m · DEC +45°52′" id="ch-finale"></section>
+
+</main>
+
+<!-- ============ 自定义光标 ============ -->
+<div id="cursor" class="cursor" aria-hidden="true">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<noscript>
+  <div class="noscript">本站需要 JavaScript 与 WebGL 才能展开三维宇宙。请开启后刷新。</div>
+</noscript>
+
+<!-- ============ 脚本（经典 script，file:// 下可直接运行）============ -->
+<script src="vendor/three.global.js"></script>
+<script src="js/glsl-lib.js"></script>
+<script src="js/lib-core.js"></script>
+<script src="js/tex-solar.js"></script>
+
+<!-- 数据与文案 -->
+<script src="js/data.js"></script>
+<script src="js/content-core.js"></script>
+<script src="js/content-solar.js"></script>
+<script src="js/content-deep.js"></script>
+<script src="js/content-cosmos.js"></script>
+<script src="js/content-human.js"></script>
+
+<!-- 场景模块 -->
+<script src="js/scene-ambient.js"></script>
+<script src="js/scene-hero.js"></script>
+<script src="js/scene-overview.js"></script>
+<script src="js/scene-nebula.js"></script>
+<script src="js/nebula-bg.js"></script>
+<script src="js/scene-solarsystem.js"></script>
+<script src="js/scene-compact.js"></script>
+<script src="js/scene-galaxies.js"></script>
+<script src="js/scene-extreme.js"></script>
+<script src="js/scene-explore.js"></script>
+
+<!-- 章节组件（DOM 控件） -->
+<script src="js/feat-solar.js"></script>
+<script src="js/feat-compare.js"></script>
+<script src="js/feat-deep.js"></script>
+<script src="js/feat-cosmos.js"></script>
+<script src="js/feat-human.js"></script>
+
+<!-- 运行时 -->
+<script src="js/postfx.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/boot.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+/* ============================================================
+ * COSMOS ATLAS · 深度天体组件样式（T2）
+ * 06 致密天体 / 07 恒星的一生
+ * ------------------------------------------------------------
+ * 只做两件事：
+ *   1. 把 widget 面板放在 3D 画面右侧（桌面）/ 顶部（窄屏），
+ *      不与左侧 .ch-copy 抢位置；
+ *   2. 给 .deep-* 自有结构排版，颜色全部走 main.css 的 token。
+ * 公共组件（.panel/.btn/.tab/.range/.data-card/.chip）由 main.css
+ * 提供，这里只做尺寸与内容层排版，不重复造按钮/滑杆。
+ * ============================================================ */
+
+/* ---------- 容器：贴住章节视口，右侧一列 ---------- */
+.ch-widget .deep-widget {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: clamp(92px, 12vh, 132px) var(--pad-x) clamp(48px, 7vh, 84px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ch-widget .deep-panel {
+  width: min(392px, 34vw);
+  max-height: calc(100vh - clamp(200px, 26vh, 260px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  padding: var(--s3);
+  pointer-events: auto;
+}
+
+.ch-widget .deep-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ch-widget .deep-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.ch-widget .deep-stellar .deep-panel {
+  width: min(432px, 36vw);
+}
+
+/* 面板内所有交互元素可点，不触发相机拖拽 */
+.ch-widget .deep-widget a,
+.ch-widget .deep-widget button,
+.ch-widget .deep-widget input,
+.ch-widget .deep-widget label,
+.ch-widget .deep-widget .tab,
+.ch-widget .deep-widget .deep-panel {
+  pointer-events: auto;
+}
+
+/* ---------- 头部 ---------- */
+.deep-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--s1);
+  border-bottom: 1px solid var(--line);
+}
+
+.deep-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--spacesuit-white);
+  letter-spacing: 0.02em;
+}
+
+.deep-title-sub {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  color: var(--fg-3);
+}
+
+/* ---------- tabs ---------- */
+.deep-tabs {
+  margin: var(--s2) 0 var(--s1);
+}
+
+.deep-tabs .tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ---------- 面板正文 ---------- */
+.deep-pane {
+  padding-top: var(--s1);
+}
+
+.deep-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: var(--s2);
+}
+
+.deep-controls .range-row {
+  margin-top: 2px;
+}
+
+.deep-controls .range-row + .range-row {
+  margin-top: var(--s1);
+}
+
+.deep-ticks,
+.deep-phase-labels {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+}
+
+.deep-phase-labels {
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.deep-phase-labels span {
+  flex: 1 1 0;
+  text-align: center;
+}
+
+.deep-phase-labels span:first-child {
+  text-align: left;
+}
+
+.deep-phase-labels span:last-child {
+  text-align: right;
+}
+
+/* ---------- 读数 ---------- */
+.deep-stats {
+  display: grid;
+  gap: 6px;
+  margin: var(--s2) 0 0;
+  padding: 0;
+}
+
+.deep-stats-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px var(--s3);
+}
+
+.deep-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.deep-stat dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
+  text-transform: none;
+}
+
+.deep-stat dd {
+  margin: 0;
+  text-align: right;
+  color: var(--spacesuit-white);
+}
+
+.deep-stats-2 .deep-stat {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.deep-stats-2 .deep-stat dd {
+  text-align: left;
+}
+
+.deep-stat-n {
+  font-family: var(--font-mono);
+  font-size: var(--fs-18);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--spacesuit-white);
+  font-variant-numeric: tabular-nums;
+}
+
+.deep-stats-2 .deep-stat-n {
+  font-size: var(--fs-16);
+}
+
+.deep-stat-u {
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--fg-3);
+}
+
+.deep-note {
+  margin: var(--s2) 0 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--fg-3);
+}
+
+/* ---------- 视角缩放（中子星） ---------- */
+.deep-zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: var(--s2) 0 0;
+}
+
+.deep-zoom-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
+}
+
+.deep-zoom-btn {
+  min-width: 34px;
+  padding: 3px 10px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.deep-zoom-hint {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+/* ---------- 命运 ---------- */
+.deep-fate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px var(--s2);
+  margin: var(--s2) 0 0;
+  padding: var(--s2) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.deep-fate-k {
+  flex: none;
+}
+
+.deep-fate-v {
+  font-family: var(--font-display);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  color: var(--spacesuit-white);
+}
+
+.deep-fate-note {
+  flex: 1 1 100%;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--fg-3);
+}
+
+/* ---------- 赫罗图 ---------- */
+.deep-hr {
+  margin: var(--s2) 0 0;
+  padding: 0;
+}
+
+.deep-hr .u-kicker {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.deep-hr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.deep-hr-grid line {
+  stroke: rgba(255, 255, 255, 0.09);
+  stroke-width: 0.6;
+}
+
+.deep-hr-axis line {
+  stroke: rgba(255, 255, 255, 0.32);
+  stroke-width: 0.8;
+}
+
+.deep-hr-ms {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.24);
+  stroke-width: 1.2;
+}
+
+.deep-hr-giant {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.24);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.deep-hr-path {
+  fill: none;
+  stroke: var(--nasa-blue-tint);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.deep-hr-marker {
+  fill: var(--spacesuit-white);
+  stroke: var(--nasa-blue);
+  stroke-width: 1.5;
+}
+
+.deep-hr-label {
+  fill: var(--spacesuit-white);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.deep-hr-labels text {
+  fill: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 照片数据卡 ---------- */
+.deep-card {
+  margin-top: var(--s2);
+}
+
+.deep-photo-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.deep-photo-btn:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+.deep-photo-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: var(--carbon-80);
+}
+
+.deep-desc {
+  margin: 6px 0 var(--s1);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--fg-2);
+}
+
+.deep-card-stats {
+  display: block;
+  margin: 0;
+}
+
+.deep-card-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.deep-card-row:last-child {
+  border-bottom: 0;
+}
+
+.deep-card-row dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+}
+
+.deep-card-row dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--spacesuit-white);
+  text-align: right;
+}
+
+.deep-photo-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 9px;
+}
+
+/* ---------- 底部按钮 ---------- */
+.deep-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--s2);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--line);
+}
+
+.deep-actions .btn {
+  flex: 0 1 auto;
+}
+
+.deep-actions .btn-primary {
+  flex: 1 1 auto;
+}
+
+/* ---------- 窄屏：面板挪到画面上方，正文仍在下方 ---------- */
+@media (max-width: 1024px) {
+  .ch-widget .deep-panel {
+    width: min(360px, 40vw);
+  }
+
+  .ch-widget .deep-stellar .deep-panel {
+    width: min(392px, 43vw);
+  }
+}
+
+@media (max-width: 860px) {
+  .ch-widget .deep-widget {
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(84px, 11vh, 112px) var(--pad-x) 0;
+  }
+
+  .ch-widget .deep-panel,
+  .ch-widget .deep-stellar .deep-panel {
+    width: 100%;
+    max-width: 560px;
+    /* 正文在下方占 62vh，面板只占上方 38vh；再扣掉顶部内边距，避免与 .ch-copy 重叠 */
+    max-height: calc(38vh - 96px);
+    padding: var(--s2) var(--s3);
+  }
+
+  .deep-hr {
+    display: none;
+  }
+
+  .deep-stats-2 {
+    gap: 6px var(--s2);
+  }
+
+  .deep-stat-n {
+    font-size: var(--fs-16);
+  }
+
+  .deep-actions {
+    position: sticky;
+    bottom: 0;
+    background: var(--carbon-90);
+    margin: 6px calc(-1 * var(--s3)) 0;
+    padding: 8px var(--s3) 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .ch-widget .deep-panel,
+  .ch-widget .deep-stellar .deep-panel {
+    max-height: calc(34vh - 92px);
+  }
+
+  .deep-tabs .tab {
+    font-size: 12px;
+    padding: 7px 4px;
+  }
+
+  .deep-card .deep-photo-img {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ---------- 减少动态 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ch-widget .deep-panel {
+    scroll-behavior: auto;
+  }
+}
