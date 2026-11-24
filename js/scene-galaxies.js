@@ -1751,6 +1751,8 @@
         if (kk['+'] || kk['=']) view.zoomMul *= Math.exp(-0.8 * dt);
         if (kk['-']) view.zoomMul *= Math.exp(0.8 * dt);
         if (inp.wheelCtrl) view.zoomMul *= Math.exp(inp.wheelCtrl * 0.0012);
+        // 普通滚轮同样缩放（boot.js 已把非 UI 区域的滚轮路由到 input.wheel）
+        if (inp.wheel) view.zoomMul *= Math.exp(inp.wheel * 0.0012);
         if (inp.pinch) view.zoomMul *= Math.exp(inp.pinch * 0.9);
       }
       view.zoomMul = U.clamp(view.zoomMul, 0.66, 1.7);
@@ -1813,6 +1815,7 @@
     return {
       scene: scene,
       camera: camera,
+      arrowKeys: true,
       update: update,
       resize: resize,
       enter: function () { },

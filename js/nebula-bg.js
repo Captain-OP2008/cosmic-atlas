@@ -531,6 +531,18 @@
       nebPlanes.push({ mesh: m, d: L.d, mat: mat });
     }
 
+    /* 星云平面是两片全屏 fbm（每像素约 23 次噪声），直接在主画布渲染会吃掉整个帧预算。
+       改为低分辨率离屏渲染 + 隔帧重渲，再加法合成：片元开销 ÷6 左右，星云缓慢漂移，肉眼看不出帧率。 */
+    const planeLayer = keep(COSMOS.util.makeLowResLayer({
+      planes: nebPlanes.map(function (pl) { return pl.mesh; }),
+      scene: scene,
+      camera: camera,
+      renderer: ctx.renderer,
+      scale: isLow ? 0.3 : 0.4,
+      every: isLow ? 3 : 2,
+      renderOrder: 0
+    }));
+
     function sizePlanes(aspect) {
       const a = aspect && aspect > 0.1 ? aspect : REF_ASPECT;
       for (let i = 0; i < nebPlanes.length; i++) {
@@ -1087,6 +1099,8 @@
         pl.mat.uniforms.uP.value = q;
         pl.mat.uniforms.uGain.value = NEB_LAYERS[i].gain * cfg.gain * planeYear;
       }
+      /* uniform 更新完再离屏渲染，避免半分辨率层落后一帧 */
+      planeLayer.render();
 
       /* 云层：漂移 + 呼吸 + 缓慢自转 */
       for (let i = 0; i < N_GAS; i++) {

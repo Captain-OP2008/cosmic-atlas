@@ -5,6 +5,8 @@
 (function (COSMOS) {
   'use strict';
 
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
+
   const THREE = window.THREE;
   const U = COSMOS.util;
   const clamp = U.clamp;
@@ -163,7 +165,7 @@
     document.documentElement.classList.add('is-loading');
 
     // 1) 界面 + 内容
-    setLoader(0.04, '正在排版图文…');
+    setLoader(0.04, T('正在排版图文…', 'Laying out the text…'));
     let meta = [];
     try {
       meta = COSMOS.UI.init(function (i) { goTo(i); });
@@ -185,10 +187,10 @@
 
     // 2) WebGL
     canvas = $('gl');
-    if (!canvas) { failHard('页面缺少画布元素。'); return; }
-    if (!hasWebGL()) { failHard('这个浏览器或显卡不支持 WebGL，无法渲染三维宇宙。'); return; }
+    if (!canvas) { failHard(T('页面缺少画布元素。', 'The canvas element is missing.')); return; }
+    if (!hasWebGL()) { failHard(T('这个浏览器或显卡不支持 WebGL，无法渲染三维宇宙。', 'This browser or GPU does not support WebGL, so the 3D universe cannot be rendered.')); return; }
 
-    setLoader(0.12, '正在初始化渲染器…');
+    setLoader(0.12, T('正在初始化渲染器…', 'Initializing the renderer…'));
     await tick();
 
     try {
@@ -203,7 +205,7 @@
       });
     } catch (e) {
       reportError('WebGLRenderer', e);
-      failHard('显卡渲染器初始化失败。');
+      failHard(T('显卡渲染器初始化失败。', 'The GPU renderer failed to initialize.'));
       return;
     }
 
@@ -258,7 +260,7 @@
       blending: THREE.NormalBlending
     });
 
-    setLoader(0.24, '正在架设光学系统…');
+    setLoader(0.24, T('正在架设光学系统…', 'Setting up the optics…'));
     await tick();
 
     // 4) 后处理
@@ -277,15 +279,15 @@
     applySize();
 
     // 5) 预建当前章与下一章
-    setLoader(0.38, '正在点燃第一颗恒星…');
+    setLoader(0.38, T('正在点燃第一颗恒星…', 'Igniting the first star…'));
     await tick();
     getStage(activeIndex);
 
-    setLoader(0.62, '正在铺开星际介质…');
+    setLoader(0.62, T('正在铺开星际介质…', 'Spreading the interstellar medium…'));
     await tick();
     getStage(Math.min(sections.length - 1, activeIndex + 1));
 
-    setLoader(0.84, '正在校准曝光…');
+    setLoader(0.84, T('正在校准曝光…', 'Calibrating exposure…'));
     await tick();
 
     // 6) 首帧
@@ -296,7 +298,7 @@
       reportError('首帧渲染', e);
     }
 
-    setLoader(1.0, '进入宇宙');
+    setLoader(1.0, T('进入宇宙', 'Entering the cosmos'));
     await tick();
     await tick();
 
@@ -633,7 +635,16 @@
   async function preloadRest() {
     for (let i = 2; i < sections.length; i++) {
       if (stages[i]) continue;
-      await new Promise(function (r) { setTimeout(r, CFG.preloadDelay); });
+      // 建一个 stage 要 100–280ms（着色器编译 + 几何上传），放在空闲时段做，
+      // 避免和首批交互抢主线程；不支持 requestIdleCallback 时用更长的定时兜底。
+      await new Promise(function (r) {
+        if (document.hidden) { r(); return; }
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(function () { r(); }, { timeout: 2500 });
+        } else {
+          setTimeout(r, CFG.preloadDelay * 2);
+        }
+      });
       if (document.hidden) return;
       getStage(i);
     }
@@ -954,23 +965,36 @@
 
     window.addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const tag = (document.activeElement && document.activeElement.tagName) || '';
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const active = document.activeElement;
+      const tag = (active && active.tagName) || '';
+      const isField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+        !!(active && active.isContentEditable);
 
       const k = e.key;
-      input.keys[k] = true;
-      if (k.length === 1) input.keys[k.toLowerCase()] = true;
 
+      // Esc 先于输入框早退：滑杆/输入框聚焦时也要能复位（§3.3 可逆）
       if (k === 'Escape') {
         const st = stages[activeIndex];
         if (st && typeof st.reset === 'function') {
           try { st.reset(); } catch (err) { reportError('reset#' + activeIndex, err); }
         }
+        // 场景复位后把同章控件参数也交回默认（ui.js 监听）
+        COSMOS.emit('cosmos:reset');
         COSMOS.emit('cosmos:escape');
         return;
       }
 
+      if (isField) return;
+      // 控件（tab / 滑杆 / 按钮）已处理过这个键，别重复响应
+      if (e.defaultPrevented) return;
+
+      input.keys[k] = true;
+      if (k.length === 1) input.keys[k.toLowerCase()] = true;
+
       const isBtn = tag === 'BUTTON';
+      const isArrow = k === 'ArrowRight' || k === 'ArrowDown' || k === 'ArrowLeft' || k === 'ArrowUp';
+      // 场景声明消费方向键时，方向键归场景（键盘等价操纵，§3.3）；切章用 PageUp/PageDown/j/k/Home/End
+      if (isArrow && !isBtn && stages[activeIndex] && stages[activeIndex].arrowKeys === true) return;
       if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || (!isBtn && (k === ' ' || k === 'j'))) {
         e.preventDefault();
         goTo(activeIndex + 1);
@@ -1011,7 +1035,7 @@
 
     boot().catch(function (e) {
       reportError('boot', e);
-      failHard('启动过程中出现异常，宇宙暂时无法展开。');
+      failHard(T('启动过程中出现异常，宇宙暂时无法展开。', 'Something went wrong during startup; the universe cannot unfold right now.'));
     });
   }
 

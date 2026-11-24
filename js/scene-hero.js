@@ -1372,6 +1372,8 @@
     return {
       scene: scene,
       camera: camera,
+      // 方向键归场景（键盘等价拖拽），切章改用 PageUp/PageDown 或 j/k
+      arrowKeys: true,
       update: update,
       resize: resize,
       reset: resetView,

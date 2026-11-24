@@ -1002,6 +1002,8 @@
       var zoomKey = (kk['+'] || kk['='] ? 1 : 0) - (kk['-'] ? 1 : 0);
       if (zoomKey !== 0) zoomMul *= Math.exp(-zoomKey * 0.85 * dt);
       if (input.wheelCtrl) zoomMul *= Math.exp(input.wheelCtrl * 0.0009);
+      // 普通滚轮同样缩放（boot.js 已把非 UI 区域的滚轮路由到 input.wheel）
+      if (input.wheel) zoomMul *= Math.exp(input.wheel * 0.0009);
       if (input.pinch) zoomMul *= Math.exp(-input.pinch * 1.15);
       zoomMul = U.clamp(zoomMul, 0.55, 2.2);
 
@@ -1169,6 +1171,7 @@
     return {
       scene: scene,
       camera: camera,
+      arrowKeys: true,
       update: update,
       resize: resize,
       enter: enter,

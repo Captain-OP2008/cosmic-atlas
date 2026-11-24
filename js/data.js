@@ -313,7 +313,7 @@
     {
       id: 'bepicolombo', name: '贝皮科伦布', en: 'BepiColombo', date: '2018-10-20', year: 2018,
       agency: 'ESA / JAXA', targets: ['水星'], status: '飞行中 · 2026 入轨', distance: '水星转移轨道', photo: null,
-      desc: '由 ESA 与水星磁层轨道器、JAXA 水星表面探测器组成，计划 2026 年进入水星轨道。',
+      desc: '由 ESA 的水星行星轨道器（MPO）与 JAXA 的水星磁层轨道器（MMO）组成，计划 2026 年进入水星轨道。',
       fact: '它需要 9 次行星飞掠（1 次地球、2 次金星、6 次水星）才能减速入轨。'
     },
     {

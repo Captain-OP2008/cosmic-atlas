@@ -10,6 +10,9 @@
 (function (COSMOS) {
   'use strict';
 
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
+  const EN = !!(COSMOS.i18n && COSMOS.i18n.en);
+
   var U = COSMOS.util;
   var h = COSMOS.dom.h;
   var num = U.num;
@@ -20,13 +23,13 @@
   var ATM_COLORS = ['#288BFF', '#1C67E3', '#0B3D91', '#B9B9BB', '#717173', '#444447'];
 
   var STAT_ROWS = [
-    { key: 'diameterKm', label: '直径', unit: 'km', fmt: function (p) { return num(p.diameterKm); }, rich: false },
-    { key: 'massKg', label: '质量', unit: 'kg', fmt: function (p) { return p.massKg; }, rich: true },
-    { key: 'gravity', label: '表面重力', unit: 'm/s²', fmt: function (p) { return p.gravity; }, rich: false },
-    { key: 'dayHours', label: '自转周期', unit: '小时', fmt: function (p) { return num(p.dayHours, 1); }, rich: false },
-    { key: 'yearDays', label: '公转周期', unit: '天', fmt: function (p) { return num(p.yearDays); }, rich: false },
-    { key: 'tempAvgC', label: '平均温度', unit: '°C', fmt: function (p) { return p.tempAvgC; }, rich: false },
-    { key: 'moons', label: '卫星数', unit: '颗', fmt: function (p) { return p.moons; }, rich: false }
+    { key: 'diameterKm', label: T('直径', 'Diameter'), unit: 'km', fmt: function (p) { return num(p.diameterKm); }, rich: false },
+    { key: 'massKg', label: T('质量', 'Mass'), unit: 'kg', fmt: function (p) { return p.massKg; }, rich: true },
+    { key: 'gravity', label: T('表面重力', 'Surface gravity'), unit: 'm/s²', fmt: function (p) { return p.gravity; }, rich: false },
+    { key: 'dayHours', label: T('自转周期', 'Rotation period'), unit: T('小时', 'hours'), fmt: function (p) { return num(p.dayHours, 1); }, rich: false },
+    { key: 'yearDays', label: T('公转周期', 'Orbital period'), unit: T('天', 'days'), fmt: function (p) { return num(p.yearDays); }, rich: false },
+    { key: 'tempAvgC', label: T('平均温度', 'Mean temperature'), unit: '°C', fmt: function (p) { return p.tempAvgC; }, rich: false },
+    { key: 'moons', label: T('卫星数', 'Moons'), unit: T('颗', ''), fmt: function (p) { return p.moons; }, rich: false }
   ];
 
   function byId(list, id) {
@@ -59,7 +62,7 @@
     var speedOut = h('output', {
       class: 'range-val u-mono',
       'for': 'sol-speed',
-      text: num(st.daysPerSec) + ' 天/秒'
+      text: T(num(st.daysPerSec) + ' 天/秒', num(st.daysPerSec) + ' days/s')
     });
     var speed = h('input', {
       class: 'range',
@@ -69,43 +72,43 @@
       max: String(SPEED_MAX),
       step: '1',
       value: String(st.daysPerSec),
-      'aria-label': '模拟速度：每秒推进多少天（0 到 3650）'
+      'aria-label': T('模拟速度：每秒推进多少天（0 到 3650）', 'Simulation speed: days advanced per second (0–3650)')
     });
 
     var playBtn = h('button', {
       class: 'btn is-small solar-play',
       type: 'button',
-      'aria-label': st.paused ? '继续公转' : '暂停公转',
-      text: st.paused ? '播放' : '暂停'
+      'aria-label': st.paused ? T('继续公转', 'Resume orbit') : T('暂停公转', 'Pause orbit'),
+      text: st.paused ? T('播放', 'Play') : T('暂停', 'Pause')
     });
     var labelBtn = h('button', {
       class: 'btn is-ghost is-small' + (st.labels !== false ? ' is-on' : ''),
       type: 'button',
       'aria-pressed': st.labels !== false ? 'true' : 'false',
-      text: '标签'
+      text: T('标签', 'Labels')
     });
     var orbitBtn = h('button', {
       class: 'btn is-ghost is-small' + (st.orbits !== false ? ' is-on' : ''),
       type: 'button',
       'aria-pressed': st.orbits !== false ? 'true' : 'false',
-      text: '轨道'
+      text: T('轨道', 'Orbits')
     });
     var resetBtn = h('button', {
       class: 'btn is-ghost is-small',
       type: 'button',
-      'aria-label': '复位视角（Esc）',
-      text: '复位'
+      'aria-label': T('复位视角（Esc）', 'Reset view (Esc)'),
+      text: T('复位', 'Reset')
     });
     var zoomOutBtn = h('button', {
       class: 'btn is-ghost is-small solar-zoom',
       type: 'button',
-      'aria-label': '缩小视图（键盘减号）',
+      'aria-label': T('缩小视图（键盘减号）', 'Zoom out (minus key)'),
       text: '−'
     });
     var zoomInBtn = h('button', {
       class: 'btn is-ghost is-small solar-zoom',
       type: 'button',
-      'aria-label': '放大视图（键盘加号）',
+      'aria-label': T('放大视图（键盘加号）', 'Zoom in (plus key)'),
       text: '+'
     });
     zoomOutBtn.addEventListener('click', function () {
@@ -117,15 +120,15 @@
     var compareBtn = h('button', {
       class: 'btn is-small solar-compare',
       type: 'button',
-      'aria-label': '前往行星对比实验室',
-      text: '行星对比 →'
+      'aria-label': T('前往行星对比实验室', 'Go to the Planet Lab'),
+      text: T('行星对比 →', 'Planet Lab →')
     });
 
     var consoleEl = h('div', { class: 'solar-console' }, [
       h('div', { class: 'solar-row solar-row-speed' }, [
         playBtn,
         h('div', { class: 'range-row solar-speed' }, [
-          h('label', { class: 'u-mono solar-speed-label', 'for': 'sol-speed', text: '速度' }),
+          h('label', { class: 'u-mono solar-speed-label', 'for': 'sol-speed', text: T('速度', 'Speed') }),
           speed,
           speedOut
         ])
@@ -137,14 +140,14 @@
 
     /* ---------------- 行星 chips ---------------- */
     var chipEls = {};
-    var chips = h('div', { class: 'solar-chips', role: 'group', 'aria-label': '行星快捷列表' });
+    var chips = h('div', { class: 'solar-chips', role: 'group', 'aria-label': T('行星快捷列表', 'Planet shortcuts') });
     planets.forEach(function (p) {
       var chip = h('button', {
         class: 'chip solar-chip',
         type: 'button',
         'data-planet': p.id,
-        'aria-label': '聚焦并查看' + p.name + '档案',
-        title: p.name + '（' + p.en + '）'
+        'aria-label': T('聚焦并查看' + p.name + '档案', 'Focus and open the ' + p.name + ' profile'),
+        title: T(p.name + '（' + p.en + '）', p.name)
       }, [
         h('span', { class: 'solar-chip-sym u-mono', 'aria-hidden': 'true', html: p.symbol }),
         h('span', { class: 'solar-chip-name', text: p.name })
@@ -170,11 +173,11 @@
 
     var note = h('p', {
       class: 'solar-note u-dim',
-      text: '距离与太阳尺寸已压缩；行星相对大小按真实直径比例缩放。'
+      text: T('距离与太阳尺寸已压缩；行星相对大小按真实直径比例缩放。', 'Distances and the Sun’s size are compressed; planet sizes keep their true diameter ratios.')
     });
     var hint = h('p', {
       class: 'solar-hint u-dim',
-      text: '拖拽 360° 旋转 · Ctrl+滚轮 / 双指缩放 · ←/→ 旋转 · Q/E 俯仰 · +/− 缩放 · 点行星查看档案 · Esc 复位'
+      text: T('拖拽 360° 旋转 · Ctrl+滚轮 / 双指缩放 · ←/→ 旋转 · Q/E 俯仰 · +/− 缩放 · 点行星查看档案 · Esc 复位', 'Drag to orbit 360° · Ctrl+wheel or pinch to zoom · ←/→ rotate · Q/E pitch · +/− zoom · Click a planet for its profile · Esc resets')
     });
 
     var root = h('div', { class: 'sol-ui solar-ui' }, [consoleEl, chips, note, hint]);
@@ -213,8 +216,8 @@
     var closeBtn = h('button', {
       class: 'drawer-close btn is-ghost is-small',
       type: 'button',
-      'aria-label': '关闭行星档案',
-      text: '关闭'
+      'aria-label': T('关闭行星档案', 'Close planet profile'),
+      text: T('关闭', 'Close')
     });
 
     var thumb = h('figure', { class: 'solar-thumb', 'aria-hidden': 'true' });
@@ -242,7 +245,7 @@
       brief,
       special,
       h('div', { class: 'solar-atmo' }, [
-        h('h4', { class: 'u-kicker', text: '大气成分' }),
+        h('h4', { class: 'u-kicker', text: T('大气成分', 'Atmosphere') }),
         atmoBar,
         atmoLegend,
         atmoNote
@@ -259,7 +262,7 @@
     }, [
       h('div', { class: 'solar-drawer-inner drawer-inner' }, [
         h('header', { class: 'drawer-head solar-drawer-head' }, [
-          h('p', { class: 'u-kicker', text: '02 · 太阳系 / 行星星历' }),
+          h('p', { class: 'u-kicker', text: T('02 · 太阳系 / 行星星历', '02 · Solar System / Planetary almanac') }),
           dTitle,
           closeBtn
         ]),
@@ -271,7 +274,7 @@
     /* ---------------- 抽屉内容（打开时填一次） ---------------- */
     function fillDrawer(p) {
       dName.textContent = p.name;
-      dEn.textContent = ' ' + p.en + ' · ' + p.type;
+      dEn.textContent = EN ? p.type : ' ' + p.en + ' · ' + p.type;
       var src = TEX[p.texture];
       if (src) thumb.style.backgroundImage = 'url("' + src + '")';
       else thumb.style.backgroundImage = 'none';
@@ -368,16 +371,16 @@
     });
 
     function syncPlay() {
-      playBtn.textContent = st.paused ? '播放' : '暂停';
-      playBtn.setAttribute('aria-label', st.paused ? '继续公转' : '暂停公转');
+      playBtn.textContent = st.paused ? T('播放', 'Play') : T('暂停', 'Pause');
+      playBtn.setAttribute('aria-label', st.paused ? T('继续公转', 'Resume orbit') : T('暂停公转', 'Pause orbit'));
       playBtn.classList.toggle('is-on', !st.paused);
     }
 
     speed.addEventListener('input', function () {
       var v = parseInt(speed.value, 10) || 0;
       st.daysPerSec = v;
-      speedOut.textContent = num(v) + ' 天/秒';
-      speed.setAttribute('aria-valuetext', num(v) + ' 天每秒');
+      speedOut.textContent = T(num(v) + ' 天/秒', num(v) + ' days/s');
+      speed.setAttribute('aria-valuetext', T(num(v) + ' 天每秒', num(v) + ' days per second'));
     });
 
     labelBtn.addEventListener('click', function () {
@@ -487,7 +490,7 @@
     // 初始同步
     syncPlay();
     syncHighlight();
-    speed.setAttribute('aria-valuetext', num(st.daysPerSec) + ' 天每秒');
+    speed.setAttribute('aria-valuetext', T(num(st.daysPerSec) + ' 天每秒', num(st.daysPerSec) + ' days per second'));
 
     return { update: update, reset: reset };
   });

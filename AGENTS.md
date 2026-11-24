@@ -2,7 +2,7 @@
 
 > **标签页切章，动手才能看见剩下的部分。**
 > 本文件是项目最高规范。改任何代码前，先读 §1 与 §6。适用范围：`cosmic-atlas/` 全仓库。
-> 最后更新 2026-11-23。v3 已上线：11 章标签页、四色斜切幕布转场、精细建模。规则改了，就在同一次改动里更新本文件。
+> 最后更新 2026-11-24。v3 已上线：11 章标签页、四色斜切幕布转场、精细建模。规则改了，就在同一次改动里更新本文件。
 
 ---
 
@@ -156,9 +156,9 @@
 | 05 | 星系动物园 · GALAXY ZOO | L2 | 形态切换 + 照片灯箱（哈勃 / 韦布原图） |
 | 06 | 极端宇宙 · EXTREME UNIVERSE | L3 | 引力波 / 暗物质 / 暗能量三模式 + 参数滑杆 |
 | 07 | 航天里程碑 · HISTORY | L3 | 1957–2024 时间轴拖动与播放，星云里的目标点逐颗点亮 |
-| 08 | 现役与未来载具 · VEHICLES | L2 | 高度排序、国别筛选、1.75 米人形比例 |
+| 08 | 现役与未来载具 · VEHICLES | L2 | 真实高度条形图、按类型筛选（火箭 / 望远镜 / 空间站）、点开档案抽屉 |
 | 09 | 未来计划 · WHAT'S NEXT | L3 | 火星旅行时间与体重计算器 |
-| 10 | 终章 · PALE BLUE DOT | L1 | 呼吸星野，回到那张 1990 年的照片 |
+| 10 | 终章 · PALE BLUE DOT | L1 | 地球缓慢自转（约 100 秒/圈），回望那张 1990 年的照片 |
 
 ### 3.3 质量红线（逐条可验）
 
@@ -183,7 +183,7 @@
 ### 3.5 输入通道（唯一入口）
 
 - 指针/滚轮/双指/键盘状态由 `boot.js` 统一收集，注入 `ctx.input`：`{ x, y, nx, ny, dx, dy, down, dragging, click, wheel, wheelCtrl, pinch, keys, uiTarget }`（**状态**不是事件；`click/wheel/wheelCtrl/pinch/dx/dy` 每帧末清零）。场景在 `update()` 里只读，不得自行绑定 window 级监听。
-- `uiTarget` 为真表示指针落在 UI 层（导航、按钮、面板），场景应忽略该次拖拽。`Esc` 会调用当前 stage 的 `reset()` 并广播 `cosmos:escape`，浮层（灯箱、抽屉）统一监听这个事件收起。
+- `uiTarget` 为真表示指针落在 UI 层（导航、按钮、面板），场景应忽略该次拖拽。`Esc` 会调用当前 stage 的 `reset()`，再广播 `cosmos:reset`（`ui.js` 用它复位本章控件参数）与 `cosmos:escape`（浮层统一监听收起）；Esc 的判定早于输入框早退，滑杆聚焦时同样生效。stage 返回 `arrowKeys: true` 表示方向键归场景（键盘等价拖拽），此时切章改用 `PageUp/PageDown`、`j/k`、`Home/End`；键盘切章只在 `e.defaultPrevented` 为假时执行（控件已处理过的键不再切章）。
 - 滚轮路由：`Ctrl/⌘ + 滚轮` → `wheelCtrl`；带 `[data-wheel]` 的区域 → `wheel`；其余在非文档流章节里 → `wheel` 且 `preventDefault`（标签页模式下页面本身不滚，滚轮用于场景缩放）。
 - 拖拽防选字：非 UI 目标上 `pointerdown` 会 `preventDefault`；拖拽阈值达成后给 `body` 加 `is-dragging` 并清空 `window.getSelection()`，松手移除。
 - 场景内交互状态放闭包，禁止每帧 `new`。
@@ -199,6 +199,7 @@
 - 篇幅：正文 600–1200 字；`lead` ≤ 40 字；每段 60–140 字。
 - 每章必须有：≥ 1 组结构化数据（`facts` 或 `timeline`）、≥ 1 个日常类比、≥ 1 个常见误解纠正、结尾一句"回扣"（把尺度拉回人）。
 - **图文同源**：3D 参数（温度、半径、质量、颜色）从同一份数据推导；文字改了，画面必须同步改。
+- **双语成对**：所有用户可见文案必须中英成对——代码内文案用 `COSMOS.i18n.T(zh, en)`，数据与章节文案同步进 `js/data-en.js` / `js/content-en.js`；英文不是机器直译，按 NASA 腔重写，数字与单位换英文习惯（million / billion light-years）。
 
 ### 4.2 数据口径
 
@@ -261,11 +262,15 @@ js/
   lib-core.js           stage/widget/content 注册表、事件总线、DOM、纹理加载、拾取
   tex-solar.js          13 张行星贴图（data URL）
   data.js               全站唯一数据源
+  i18n.js               双语层：语言检测（`?lang=` / localStorage）、`T(zh,en)` 双参数翻译、静态文案与章节名替换、HUD 切换按钮
+  data-en.js            英文模式的数据覆盖层（紧随 data.js，按 id / 数组索引覆盖英文字段）
+  content-en.js         英文模式的 11 章文案覆盖层（紧随 content-*.js，覆盖 title / part / lead / paragraphs / facts 等）
   content-core/solar/deep/cosmos/human.js   文案与控件
   scene-ambient.js      starfield / idle
   scene-hero.js         hero
   scene-overview.js     overview（拉尼亚凯亚超星系团：丝绸 ribbon 纤维 1000+ 条/约 25 万三角 + 金色标签，标签亚像素同帧跟随）
-  scene-nebula.js       nebula（终章，旧 deepfield 别名保留）
+  scene-finale-earth.js paleblue（终章：自动自转地球，日面/夜灯/云层/大气）
+  scene-nebula.js       nebula（旧终章星云，现无章节引用，保留 deepfield 别名）
   nebula-bg.js          星云背景工厂：航天里程碑 / 载具 / 未来计划三章共用（标签 09–11，data-stage explore1/2/3），配色 / 构图 / 年份联动参数化
   scene-solarsystem.js  solar
   scene-compact.js      compact
@@ -284,9 +289,10 @@ shots/                  验收截图
 ```
 
 - 新增 `js` 文件必须按依赖顺序加进 `index.html`（在 `boot.js` 之前）；新增 stage 必须同时有同名 `data-stage` 章节和对应的 `content-*.js` 条目。
+- 双语：`i18n.js` 在 `lib-core.js` 之后、其余脚本之前加载，确定 `COSMOS.i18n.lang`（`?lang=` > localStorage > 默认中文）；`data-en.js` 紧随 `data.js`、`content-en.js` 紧随 `content-*.js`，只在英文模式覆盖英文层，不改中文原文。HUD 右侧 `#lang-toggle` 切换语言：写 localStorage → 带 hash 整页重载（当前章节保持），幕布负责过渡。
 - 改章节结构要三处同改：`index.html`、对应的 `js/content-*.js`、`README.md` 表格。
 - 版式有两套：默认 3D 分割章（整章固定 100vh，文案栏内部滚动），以及 `ui.js` 的 `FLOW_CHAPTERS`（compare / history / vehicles / future）走文档流（整章滚动）；新增文档流章节要把 id 加进那张表。
-- 章节切换只走 `boot.js` 的 `tabGo(i)`：四色幕布 `#curtain` 切入 → `commitTab` 换 stage → 幕布切出；`goTo` 是 `tabGo` 的别名。`#nav` 是 `role="tablist"` 的顶部标签栏，键盘 ←/→ 也可切章。
+- 章节切换只走 `boot.js` 的 `tabGo(i)`：四色幕布 `#curtain` 切入 → `commitTab` 换 stage → 幕布切出；`goTo` 是 `tabGo` 的别名。`#nav` 是 `role="tablist"` 的顶部标签栏，键盘 `j/k`、`PageUp/PageDown`、`Home/End` 可切章；`←/→/↑/↓` 在声明 `arrowKeys` 的场景章归场景旋转。
 - 幕布动画时长 460ms / 500ms 是品牌动效（参照学习中心），不属于 §2.5 的 5 档时长，改动需同步更新此说明。
 
 ---
@@ -315,7 +321,7 @@ shots/                  验收截图
 
 **交互**
 - [ ] 该章达到 §3.2 的级别，"动手才看得见的瞬间"存在
-- [ ] 顶部标签可点击切章，四色幕布转场完整播放且不打断交互；←/→ 键盘可切章
+- [ ] 顶部标签可点击切章，四色幕布转场完整播放且不打断交互；`j/k`、`PageUp/PageDown` 键盘可切章（`←/→` 在 `arrowKeys` 场景章归场景）
 - [ ] 鼠标 / 触摸 / 键盘三通道都能完成同一操作
 - [ ] Esc 或复位可用；2s 内有可见结果
 - [ ] L3 参数显示当前值与单位，画面同帧变化

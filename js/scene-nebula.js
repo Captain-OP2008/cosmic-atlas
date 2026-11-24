@@ -447,6 +447,18 @@
       nebPlanes.push({ mesh: m, d: L.d, mat: mat });
     }
 
+    /* 两片全屏 fbm 是本章最大开销（每像素约 23 次噪声）。低分辨率离屏渲染 + 隔帧重渲再加法合成，
+       片元开销 ÷6 左右；星云本身缓慢漂移，上采样后肉眼无差。 */
+    const planeLayer = keep(COSMOS.util.makeLowResLayer({
+      planes: nebPlanes.map(function (pl) { return pl.mesh; }),
+      scene: scene,
+      camera: camera,
+      renderer: ctx.renderer,
+      scale: isLow ? 0.3 : 0.4,
+      every: isLow ? 3 : 2,
+      renderOrder: 0
+    }));
+
     // 让平面在 p=0 时正好铺满视锥
     function sizePlanes(aspect) {
       const a = aspect && aspect > 0.1 ? aspect : REF_ASPECT;
@@ -1008,6 +1020,8 @@
         pl.mat.uniforms.uTime.value = t;
         pl.mat.uniforms.uP.value = q;
       }
+      /* uniform 更新完再离屏渲染，避免半分辨率层落后一帧 */
+      planeLayer.render();
 
       // 星云云层：漂移 + 呼吸 + 缓慢自转
       for (let i = 0; i < N_GAS; i++) {

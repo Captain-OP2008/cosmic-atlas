@@ -13,6 +13,9 @@
 (function (COSMOS) {
   'use strict';
 
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
+  const EN = !!(COSMOS.i18n && COSMOS.i18n.en);
+
   var D = COSMOS.DATA || {};
   if (!COSMOS || !COSMOS.dom || !COSMOS.dom.h) return;
   var h = COSMOS.dom.h;
@@ -29,76 +32,76 @@
    * ============================================================ */
   var PHOTOS = {
     'galaxy-whirlpool': {
-      telescope: 'NASA / ESA · 哈勃空间望远镜',
+      telescope: T('NASA / ESA · 哈勃空间望远镜', "NASA / ESA · Hubble Space Telescope"),
       year: '2005',
-      note: '涡旋星系 M51 与伴星系 NGC 5195 正在相互作用，旋臂被压缩成一条条恒星形成带。'
+      note: T('涡旋星系 M51 与伴星系 NGC 5195 正在相互作用，旋臂被压缩成一条条恒星形成带。', "The Whirlpool Galaxy M51 and its companion NGC 5195 are interacting; the arms are compressed into chains of star formation.")
     },
     'galaxy-andromeda': {
-      telescope: 'NASA / ESA · 哈勃空间望远镜',
+      telescope: T('NASA / ESA · 哈勃空间望远镜', "NASA / ESA · Hubble Space Telescope"),
       year: '2015',
-      note: '哈勃对仙女座星系局部拍摄的拼接图，分辨率足以把单个恒星分辨出来。'
+      note: T('哈勃对仙女座星系局部拍摄的拼接图，分辨率足以把单个恒星分辨出来。', "A Hubble mosaic of part of the Andromeda Galaxy, sharp enough to resolve individual stars.")
     },
     'galaxy-sombrero': {
-      telescope: 'NASA · 斯皮策空间望远镜（红外）',
+      telescope: T('NASA · 斯皮策空间望远镜（红外）', "NASA · Spitzer Space Telescope (infrared)"),
       year: '',
-      note: '红外波段穿过尘埃，露出草帽星系盘面与被恒星加热的尘埃环。'
+      note: T('红外波段穿过尘埃，露出草帽星系盘面与被恒星加热的尘埃环。', "Infrared light passes through dust, revealing the Sombrero Galaxy's disk and its star-heated dust ring.")
     },
     'galaxy-antennae': {
-      telescope: 'NASA · 斯皮策空间望远镜（红外）',
+      telescope: T('NASA · 斯皮策空间望远镜（红外）', "NASA · Spitzer Space Telescope (infrared)"),
       year: '2010',
-      note: '碰撞中的两个星系，潮汐力把气体与恒星甩成两条长尾，像一对触角。'
+      note: T('碰撞中的两个星系，潮汐力把气体与恒星甩成两条长尾，像一对触角。', "Two colliding galaxies; tidal forces have flung gas and stars into two long tails, like a pair of antennae.")
     },
     'galaxy-barred': {
-      telescope: 'NASA / ESA · 哈勃空间望远镜',
+      telescope: T('NASA / ESA · 哈勃空间望远镜', "NASA / ESA · Hubble Space Telescope"),
       year: '2005',
-      note: 'NGC 1300 的中央棒结构，把气体与恒星输往星系核心。'
+      note: T('NGC 1300 的中央棒结构，把气体与恒星输往星系核心。', "The central bar of NGC 1300 funnels gas and stars toward the galaxy's core.")
     },
     'galaxy-lmc': {
-      telescope: 'NASA / ESA · 哈勃空间望远镜',
+      telescope: T('NASA / ESA · 哈勃空间望远镜', "NASA / ESA · Hubble Space Telescope"),
       year: '',
-      note: '大麦哲伦云的恒星形成区；1987A 超新星就诞生在这片不规则伴星系里。'
+      note: T('大麦哲伦云的恒星形成区；1987A 超新星就诞生在这片不规则伴星系里。', "Star-forming regions in the Large Magellanic Cloud; Supernova 1987A was born in this irregular companion galaxy.")
     },
     'galaxy-cartwheel': {
-      telescope: 'NASA / ESA 影像',
+      telescope: T('NASA / ESA 影像', "NASA / ESA imagery"),
       year: '',
-      note: '车轮星系：一个小星系垂直穿过盘面后，激波把气体挤压成环状恒星带。'
+      note: T('车轮星系：一个小星系垂直穿过盘面后，激波把气体挤压成环状恒星带。', "The Cartwheel Galaxy: after a small galaxy punched through the disk, a shock wave compressed gas into a ring of star formation.")
     },
     'galaxy-deepfield': {
-      telescope: 'NASA / ESA · 哈勃空间望远镜',
+      telescope: T('NASA / ESA · 哈勃空间望远镜', "NASA / ESA · Hubble Space Telescope"),
       year: '2004',
-      note: '哈勃超深场：累计曝光 11.3 天，画面里约有 1 万个星系。'
+      note: T('哈勃超深场：累计曝光 11.3 天，画面里约有 1 万个星系。', "The Hubble Ultra Deep Field: 11.3 days of total exposure, with roughly 10,000 galaxies in frame.")
     },
     'deep-gravwave': {
-      telescope: 'NASA / JPL-Caltech · 科学示意',
+      telescope: T('NASA / JPL-Caltech · 科学示意', "NASA / JPL-Caltech · artist's concept"),
       year: '2016',
-      note: '双黑洞并合示意：并合瞬间约有 3 个太阳的质量转化为引力波。'
+      note: T('双黑洞并合示意：并合瞬间约有 3 个太阳的质量转化为引力波。', "Artist's concept of a binary black hole merger: about 3 solar masses converted into gravitational waves in the final instant.")
     },
     'deep-darkmatter': {
-      telescope: 'NASA / JPL-Caltech · 科学示意',
+      telescope: T('NASA / JPL-Caltech · 科学示意', "NASA / JPL-Caltech · artist's concept"),
       year: '',
-      note: '暗物质晕示意：它不发光、不挡光，只在引力上留下痕迹。'
+      note: T('暗物质晕示意：它不发光、不挡光，只在引力上留下痕迹。', "Artist's concept of a dark matter halo: it emits no light and blocks no light, leaving only gravitational traces.")
     },
     'deep-darkenergy': {
-      telescope: 'NASA / JPL-Caltech · 科学示意',
+      telescope: T('NASA / JPL-Caltech · 科学示意', "NASA / JPL-Caltech · artist's concept"),
       year: '',
-      note: '暗能量示意：空间本身的能量密度让宇宙膨胀加速。'
+      note: T('暗能量示意：空间本身的能量密度让宇宙膨胀加速。', "Artist's concept of dark energy: the energy density of space itself makes cosmic expansion accelerate.")
     },
     'deep-quasar': {
-      telescope: 'NASA / JPL-Caltech · 科学示意',
+      telescope: T('NASA / JPL-Caltech · 科学示意', "NASA / JPL-Caltech · artist's concept"),
       year: '',
-      note: '类星体示意：中心黑洞吸积物质时释放的引力能，让它比整个星系还亮。'
+      note: T('类星体示意：中心黑洞吸积物质时释放的引力能，让它比整个星系还亮。', "Artist's concept of a quasar: gravitational energy released as matter accretes onto the central black hole outshines the entire galaxy.")
     }
   };
 
   function photoMeta(key) {
-    return PHOTOS[key] || { telescope: 'NASA / ESA 影像', year: '', note: '' };
+    return PHOTOS[key] || { telescope: T('NASA / ESA 影像', "NASA / ESA imagery"), year: '', note: '' };
   }
 
   function typeLabel(type) {
-    if (type === 'spiral') return '螺旋星系';
-    if (type === 'elliptical') return '椭圆星系';
-    if (type === 'irregular') return '不规则星系';
-    if (type === 'deep') return '深场';
+    if (type === 'spiral') return T('螺旋星系', "Spiral galaxy");
+    if (type === 'elliptical') return T('椭圆星系', "Elliptical galaxy");
+    if (type === 'irregular') return T('不规则星系', "Irregular galaxy");
+    if (type === 'deep') return T('深场', "Deep field");
     return '—';
   }
 
@@ -112,7 +115,7 @@
       class: 'lightbox cz-lightbox',
       role: 'dialog',
       'aria-modal': 'true',
-      'aria-label': '照片查看器',
+      'aria-label': T('照片查看器', "Photo viewer"),
       'aria-hidden': 'true',
       hidden: true
     });
@@ -129,9 +132,9 @@
     fig.appendChild(img);
     fig.appendChild(cap);
 
-    var btnClose = h('button', { class: 'btn btn-ghost btn-sm cz-lb-close', type: 'button', 'aria-label': '关闭照片查看器' }, ['关闭']);
-    var btnPrev = h('button', { class: 'btn btn-ghost cz-lb-nav is-prev', type: 'button', 'aria-label': '上一张照片' }, ['←']);
-    var btnNext = h('button', { class: 'btn btn-ghost cz-lb-nav is-next', type: 'button', 'aria-label': '下一张照片' }, ['→']);
+    var btnClose = h('button', { class: 'btn btn-ghost btn-sm cz-lb-close', type: 'button', 'aria-label': T('关闭照片查看器', 'Close photo viewer') }, [T('关闭', 'Close')]);
+    var btnPrev = h('button', { class: 'btn btn-ghost cz-lb-nav is-prev', type: 'button', 'aria-label': T('上一张照片', "Previous photo") }, ['←']);
+    var btnNext = h('button', { class: 'btn btn-ghost cz-lb-nav is-next', type: 'button', 'aria-label': T('下一张照片', "Next photo") }, ['→']);
 
     root.appendChild(btnClose);
     root.appendChild(btnPrev);
@@ -159,7 +162,7 @@
     btnNext.addEventListener('click', function () { stepLightbox(1); });
     img.addEventListener('error', function () {
       root.classList.add('is-miss');
-      note.textContent = '图像暂时不可用。';
+      note.textContent = T('图像暂时不可用。', "Image temporarily unavailable.");
     });
     root.addEventListener('click', function (e) {
       if (e.target === root) closeLightbox();
@@ -180,6 +183,14 @@
         e.preventDefault();
         e.stopPropagation();
         stepLightbox(1);
+      } else if (e.key === 'Tab') {
+        // Tab 在灯箱内循环，不逃到背后页面
+        e.preventDefault();
+        var order = [lb.btnClose, lb.btnPrev, lb.btnNext];
+        var at = order.indexOf(document.activeElement);
+        var step = e.shiftKey ? -1 : 1;
+        var base = at < 0 ? (e.shiftKey ? 0 : -1) : at;
+        order[(base + step + order.length) % order.length].focus();
       }
     }, true);
 
@@ -249,9 +260,9 @@
     if (!el || el.querySelector('.cz-panel')) return;
     var GAL = D.galaxies || [];
     var TYPES = [
-      { id: 'spiral', label: '螺旋' },
-      { id: 'elliptical', label: '椭圆' },
-      { id: 'irregular', label: '不规则' }
+      { id: 'spiral', label: T('螺旋', 'Spiral') },
+      { id: 'elliptical', label: T('椭圆', 'Elliptical') },
+      { id: 'irregular', label: T('不规则', 'Irregular') }
     ];
 
     COSMOS.state = COSMOS.state || {};
@@ -272,7 +283,7 @@
     }
 
     /* ---- tabs ---- */
-    var tabs = h('div', { class: 'tabs cz-tabs', role: 'tablist', 'aria-label': '星系类型' });
+    var tabs = h('div', { class: 'tabs cz-tabs', role: 'tablist', 'aria-label': T('星系类型', 'Galaxy type') });
     var tabBtns = {};
     TYPES.forEach(function (t) {
       var b = h('button', {
@@ -299,14 +310,14 @@
 
     /* ---- 代表星系 ---- */
     var featImg = h('img', { class: 'cz-feat-img', alt: '' });
-    var featNoImg = h('div', { class: 'cz-noimg' }, ['暂无实拍照片']);
+    var featNoImg = h('div', { class: 'cz-noimg' }, [T('暂无实拍照片', 'No photo available')]);
     var featName = h('h3', { class: 'cz-feat-name' });
     var featEn = h('p', { class: 'cz-feat-en u-mono' });
     var featMeta = h('p', { class: 'cz-feat-meta u-dim' });
     var featMedia = h('div', { class: 'cz-feat-media' });
     featMedia.appendChild(featImg);
     featMedia.appendChild(featNoImg);
-    var featBtn = h('button', { class: 'cz-feat', type: 'button', 'aria-label': '查看代表星系照片' });
+    var featBtn = h('button', { class: 'cz-feat', type: 'button', 'aria-label': T('查看代表星系照片', 'View the featured galaxy photo') });
     featBtn.appendChild(featMedia);
     featBtn.appendChild(featName);
     featBtn.appendChild(featEn);
@@ -321,10 +332,10 @@
 
     /* ---- 数据卡 ---- */
     var statDefs = [
-      { key: 'form', label: '形态类型' },
-      { key: 'diameter', label: '直径' },
-      { key: 'stars', label: '恒星数量级（估算）' },
-      { key: 'distance', label: '距离' }
+      { key: 'form', label: T('形态类型', 'Morphology') },
+      { key: 'diameter', label: T('直径', 'Diameter') },
+      { key: 'stars', label: T('恒星数量级（估算）', 'Stars (estimated)') },
+      { key: 'distance', label: T('距离', 'Distance') }
     ];
     var statVals = {};
     var stats = h('div', { class: 'cz-stats' });
@@ -339,17 +350,17 @@
 
     /* ---- 画廊 ---- */
     var galleryHead = h('p', { class: 'cz-gallery-head' }, [
-      '照片 · ' + galleryList.length,
-      h('span', { class: 'u-dim' }, [' 点击查看大图'])
+      T('照片 · ', "Photos · ") + galleryList.length,
+      h('span', { class: 'u-dim' }, [T(' 点击查看大图', " Click to enlarge")])
     ]);
-    var gallery = h('div', { class: 'cz-gallery', role: 'group', 'aria-label': '星系照片画廊' });
+    var gallery = h('div', { class: 'cz-gallery', role: 'group', 'aria-label': T('星系照片画廊', 'Galaxy photo gallery') });
     galleryList.forEach(function (it, idx) {
       var img = h('img', { src: photoSrc(it.photo), alt: it.title, loading: 'lazy' });
       var btn = h('button', {
         class: 'cz-thumb',
         type: 'button',
-        title: it.title + ' · 打开大图',
-        'aria-label': it.title + '，打开大图'
+        title: it.title + T(' · 打开大图', " · Open image"),
+        'aria-label': it.title + T('，打开大图', " — open image")
       });
       btn.appendChild(img);
       img.addEventListener('error', function () { btn.classList.add('is-miss'); });
@@ -357,9 +368,9 @@
       gallery.appendChild(btn);
     });
 
-    var hint = h('p', { class: 'cz-hint' }, ['拖拽旋转星系模型 · 1 / 2 / 3 切换类型 · Esc 复位视角']);
+    var hint = h('p', { class: 'cz-hint' }, [T('拖拽旋转星系模型 · 1 / 2 / 3 切换类型 · Esc 复位视角', "Drag to rotate the galaxy · 1 / 2 / 3 switch type · Esc resets the view")]);
 
-    var panel = h('aside', { class: 'panel cz-panel cz-panel--galaxies', 'aria-label': '星系动物园控制面板' });
+    var panel = h('aside', { class: 'panel cz-panel cz-panel--galaxies', 'aria-label': T('星系动物园控制面板', 'Galaxy zoo control panel') });
     panel.appendChild(tabs);
     panel.appendChild(featBtn);
     panel.appendChild(stats);
@@ -386,7 +397,8 @@
       if (!g) {
         featImg.style.display = 'none';
         featNoImg.style.display = 'flex';
-        featName.textContent = '暂无数据';
+        featName.textContent = T('暂无数据', "No data available");
+        featEn.hidden = EN;
         featEn.textContent = '';
         featMeta.textContent = '';
         statVals.form.textContent = typeLabel(type);
@@ -406,11 +418,12 @@
         featImg.style.display = 'none';
         featImg.removeAttribute('src');
         featNoImg.style.display = 'flex';
-        featMeta.textContent = '这一类没有可用实拍照片，几何形态请看 3D 模型';
+        featMeta.textContent = T('这一类没有可用实拍照片，几何形态请看 3D 模型', "No photo is available for this class; see the 3D model for its shape.");
       }
       featName.textContent = g.name;
-      featEn.textContent = g.en;
-      featBtn.setAttribute('aria-label', g.photo ? ('查看 ' + g.name + ' 的照片') : (g.name + '（暂无照片）'));
+      featEn.hidden = EN;
+      featEn.textContent = EN ? '' : g.en;
+      featBtn.setAttribute('aria-label', g.photo ? T('查看 ' + g.name + ' 的照片', 'View photo of ' + g.name) : T(g.name + '（暂无照片）', g.name + ' (no photo)'));
       featBtn.disabled = !g.photo;
       statVals.form.textContent = typeLabel(g.type);
       statVals.diameter.textContent = g.diameterLy || '—';
@@ -449,20 +462,20 @@
     var curMode = EX.mode;
 
     var MODES = [
-      { id: 'gravity', label: '引力波' },
-      { id: 'darkmatter', label: '暗物质' },
-      { id: 'darkenergy', label: '暗能量' }
+      { id: 'gravity', label: T('引力波', 'Gravitational waves') },
+      { id: 'darkmatter', label: T('暗物质', 'Dark matter') },
+      { id: 'darkenergy', label: T('暗能量', 'Dark energy') }
     ];
 
     var photoList = [
-      photoItem('deep-gravwave', '双黑洞并合示意', ''),
-      photoItem('deep-darkmatter', '暗物质晕示意', ''),
-      photoItem('deep-darkenergy', '暗能量与膨胀宇宙示意', ''),
-      photoItem('deep-quasar', '类星体示意', '')
+      photoItem('deep-gravwave', T('双黑洞并合示意', "Artist's concept: binary black hole merger"), ''),
+      photoItem('deep-darkmatter', T('暗物质晕示意', "Artist's concept: dark matter halo"), ''),
+      photoItem('deep-darkenergy', T('暗能量与膨胀宇宙示意', "Artist's concept: dark energy and the expanding universe"), ''),
+      photoItem('deep-quasar', T('类星体示意', "Artist's concept: quasar"), '')
     ];
 
     /* ---- tabs ---- */
-    var tabs = h('div', { class: 'tabs cz-tabs', role: 'tablist', 'aria-label': '极端宇宙模式' });
+    var tabs = h('div', { class: 'tabs cz-tabs', role: 'tablist', 'aria-label': T('极端宇宙模式', 'Extreme universe modes') });
     var tabBtns = {};
     MODES.forEach(function (m) {
       var b = h('button', {
@@ -510,11 +523,11 @@
       class: 'range cz-range', type: 'range',
       min: '0', max: '1000', step: '1',
       value: String(strainToSlider(EX.strain)),
-      'aria-label': '引力波应变（对数刻度，1e-22 到 1e-18）'
+      'aria-label': T('引力波应变（对数刻度，1e-22 到 1e-18）', "Gravitational-wave strain (log scale, 1e-22 to 1e-18)")
     });
     var strainOut = h('span', { class: 'cz-range-val u-mono', 'aria-live': 'polite' });
     var strainRow = h('div', { class: 'range-row cz-range-row' });
-    strainRow.appendChild(h('span', { class: 'cz-range-label' }, ['应变 h']));
+    strainRow.appendChild(h('span', { class: 'cz-range-label' }, [T('应变 h', "Strain h")]));
     strainRow.appendChild(strainSlider);
     strainRow.appendChild(strainOut);
     strainSlider.addEventListener('input', function () {
@@ -522,10 +535,10 @@
       updateStrainOut();
     });
     gravityBlock.appendChild(strainRow);
-    gravityBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, ['LIGO 的干涉臂长 4 公里；应变 1e-21 时，臂长变化约为 4 × 10⁻¹⁸ 米，不到质子直径的千分之一。']));
+    gravityBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, [T('LIGO 的干涉臂长 4 公里；应变 1e-21 时，臂长变化约为 4 × 10⁻¹⁸ 米，不到质子直径的千分之一。', "LIGO's 4 km arms: at a strain of 1e-21, each arm changes length by about 4 × 10^-18 m — less than a thousandth of a proton diameter.")]));
     gravityBlock.appendChild(readoutBlock('gravwave'));
-    gravityBlock.appendChild(photoButton('deep-gravwave', '引力波：双黑洞并合示意'));
-    gravityBlock.appendChild(h('p', { class: 'cz-note' }, ['这意味着什么：时空不是静止的舞台，它会被加速的质量扰动，并以光速把形变传出去。2015 年 9 月 14 日，LIGO 第一次直接"听"到了 13 亿光年外两个黑洞的并合。']));
+    gravityBlock.appendChild(photoButton('deep-gravwave', T('引力波：双黑洞并合示意', "Gravitational waves: binary black hole merger")));
+    gravityBlock.appendChild(h('p', { class: 'cz-note' }, [T('这意味着什么：时空不是静止的舞台，它会被加速的质量扰动，并以光速把形变传出去。2015 年 9 月 14 日，LIGO 第一次直接"听"到了 13 亿光年外两个黑洞的并合。', "What this means: spacetime is not a fixed stage — it is disturbed by accelerating masses and carries the distortion outward at the speed of light. On 14 September 2015, LIGO directly \"heard\" the merger of two black holes 1.3 billion light-years away.")]));
 
     /* ============ 模式 2：暗物质 ============ */
     var dmBlock = h('div', { class: 'cz-mode', 'data-mode': 'darkmatter' });
@@ -535,16 +548,16 @@
       class: 'range cz-range', type: 'range',
       min: '0.6', max: '3.0', step: '0.05',
       value: String(EX.dmMass),
-      'aria-label': '暗物质晕质量 M200，单位 10 的 12 次方太阳质量'
+      'aria-label': T('暗物质晕质量 M200，单位 10 的 12 次方太阳质量', "Dark matter halo mass M200, in units of 10^12 solar masses")
     });
     var massOut = h('span', { class: 'cz-range-val u-mono', 'aria-live': 'polite' });
     var massRow = h('div', { class: 'range-row cz-range-row' });
-    massRow.appendChild(h('span', { class: 'cz-range-label' }, ['M200']));
+    massRow.appendChild(h('span', { class: 'cz-range-label' }, [T('M200（万亿倍太阳质量）', 'M200 (10¹² M☉)')]));
     massRow.appendChild(massSlider);
     massRow.appendChild(massOut);
 
     var vOutRow = h('div', { class: 'cz-param-line' });
-    vOutRow.appendChild(h('span', { class: 'cz-param-k u-dim' }, ['30 kpc 处预测速度']));
+    vOutRow.appendChild(h('span', { class: 'cz-param-k u-dim' }, [T('30 kpc 处预测速度', "Predicted velocity at 30 kpc")]));
     var vOut = h('span', { class: 'cz-param-v u-mono', 'aria-live': 'polite' }, ['—']);
     vOutRow.appendChild(vOut);
 
@@ -556,14 +569,14 @@
 
     dmBlock.appendChild(massRow);
     dmBlock.appendChild(vOutRow);
-    dmBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, ['M200 是晕内平均密度达到宇宙临界密度 200 倍的那个球体内的质量。滑杆改变暗物质晕的大小与质量，蓝色曲线是它单独能给出的旋转速度。']));
+    dmBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, [T('M200 是晕内平均密度达到宇宙临界密度 200 倍的那个球体内的质量。滑杆改变暗物质晕的大小与质量，蓝色曲线是它单独能给出的旋转速度。', "M200 is the mass inside the sphere where the mean density is 200 times the cosmic critical density. The slider changes the size and mass of the dark matter halo; the blue curve is the rotation speed it produces on its own.")]));
 
     // ---- 两个开关：晕 / 透镜弧 ----
     var toggleRow = h('div', { class: 'cz-toggle-row' });
     var haloBtn = h('button', {
       class: 'btn btn-sm cz-toggle', type: 'button',
       'aria-pressed': EX.dmHalo ? 'true' : 'false'
-    }, ['暗物质晕']);
+    }, [T('暗物质晕', 'Dark matter halo')]);
     haloBtn.addEventListener('click', function () {
       EX.dmHalo = !EX.dmHalo;
       syncToggles();
@@ -571,7 +584,7 @@
     var lensBtn = h('button', {
       class: 'btn btn-sm cz-toggle', type: 'button',
       'aria-pressed': EX.dmLens ? 'true' : 'false'
-    }, ['引力透镜弧']);
+    }, [T('引力透镜弧', 'Gravitational lensing arcs')]);
     lensBtn.addEventListener('click', function () {
       EX.dmLens = !EX.dmLens;
       syncToggles();
@@ -579,17 +592,17 @@
     toggleRow.appendChild(haloBtn);
     toggleRow.appendChild(lensBtn);
     dmBlock.appendChild(toggleRow);
-    dmBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, ['关掉晕：画面里只剩恒星和气体，但外围恒星仍转得太快；关掉透镜弧：那些被拉长的背景星系也一起消失——两者都是暗物质存在的间接证据。']));
+    dmBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, [T('关掉晕：画面里只剩恒星和气体，但外围恒星仍转得太快；关掉透镜弧：那些被拉长的背景星系也一起消失——两者都是暗物质存在的间接证据。', "Turn off the halo: only stars and gas remain, yet the outer stars still orbit too fast. Turn off the lensing arcs: the stretched background galaxies vanish too. Both are indirect evidence that dark matter exists.")]));
 
     dmBlock.appendChild(curve.wrap);
     dmBlock.appendChild(h('div', { class: 'legend cz-legend cz-legend-col' }, [
-      legendItem('观测：外围速度几乎不变', 'obs'),
-      legendItem('可见物质：按牛顿引力应下降', 'vis'),
-      legendItem('NFW 暗物质晕：单独给出的速度', 'nfw')
+      legendItem(T('观测：外围速度几乎不变', "Observed: outer speeds stay nearly flat"), 'obs'),
+      legendItem(T('可见物质：按牛顿引力应下降', "Visible matter: should fall off under Newtonian gravity"), 'vis'),
+      legendItem(T('NFW 暗物质晕：单独给出的速度', "NFW dark matter halo: rotation speed on its own"), 'nfw')
     ]));
     dmBlock.appendChild(readoutBlock('darkmatter'));
-    dmBlock.appendChild(photoButton('deep-darkmatter', '暗物质晕示意'));
-    dmBlock.appendChild(h('p', { class: 'cz-note' }, ['这意味着什么：星系转得太快，可见物质的引力拉不住外围恒星，必须存在大量不发光、也不与光作用的物质。它占宇宙总能量的 26.8%，但本质仍是未解问题。']));
+    dmBlock.appendChild(photoButton('deep-darkmatter', T('暗物质晕示意', "Artist's concept: dark matter halo")));
+    dmBlock.appendChild(h('p', { class: 'cz-note' }, [T('这意味着什么：星系转得太快，可见物质的引力拉不住外围恒星，必须存在大量不发光、也不与光作用的物质。它占宇宙总能量的 26.8%，但本质仍是未解问题。', "What this means: galaxies rotate too fast; the gravity of visible matter cannot hold their outer stars, so a large amount of matter that neither shines nor interacts with light must exist. It makes up 26.8% of the universe's total energy, yet its nature remains an open problem.")]));
 
     /* ============ 模式 3：暗能量 ============ */
     var deBlock = h('div', { class: 'cz-mode', 'data-mode': 'darkenergy' });
@@ -597,11 +610,11 @@
       class: 'range cz-range', type: 'range',
       min: '1', max: '3', step: '0.01',
       value: String(EX.scaleFactor),
-      'aria-label': '宇宙尺度因子 a（1 到 3）'
+      'aria-label': T('宇宙尺度因子 a（1 到 3）', "Cosmic scale factor a (1 to 3)")
     });
     var aOut = h('span', { class: 'cz-range-val u-mono', 'aria-live': 'polite' });
     var aRow = h('div', { class: 'range-row cz-range-row' });
-    aRow.appendChild(h('span', { class: 'cz-range-label' }, ['尺度 a']));
+    aRow.appendChild(h('span', { class: 'cz-range-label' }, [T('尺度 a', "Scale factor a")]));
     aRow.appendChild(aSlider);
     aRow.appendChild(aOut);
     aSlider.addEventListener('input', function () {
@@ -611,7 +624,7 @@
     deBlock.appendChild(aRow);
 
     var aOutRow = h('div', { class: 'cz-param-line' });
-    aOutRow.appendChild(h('span', { class: 'cz-param-k u-dim' }, ['膨胀速率 ȧ / H₀']));
+    aOutRow.appendChild(h('span', { class: 'cz-param-k u-dim' }, [T('膨胀速率 ȧ / H₀', "Expansion rate ȧ / H₀")]));
     var aRateOut = h('span', { class: 'cz-param-v u-mono', 'aria-live': 'polite' }, ['—']);
     aOutRow.appendChild(aRateOut);
 
@@ -619,22 +632,22 @@
     deBlock.appendChild(aOutRow);
     deBlock.appendChild(expCurve.wrap);
     deBlock.appendChild(h('div', { class: 'legend cz-legend cz-legend-col' }, [
-      legendItem('物质主导：膨胀被引力拖慢', 'slow'),
-      legendItem('暗能量主导：膨胀开始加速', 'acc')
+      legendItem(T('物质主导：膨胀被引力拖慢', "Matter-dominated: expansion slows under gravity"), 'slow'),
+      legendItem(T('暗能量主导：膨胀开始加速', "Dark-energy-dominated: expansion accelerates"), 'acc')
     ]));
     deBlock.appendChild(h('p', { class: 'cz-formula u-mono', html: 'v = H<sub>0</sub> × d&nbsp;&nbsp;&nbsp;H<sub>0</sub> ≈ 70 km/s/Mpc' }));
-    deBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, ['拖动尺度因子：所有星系随空间一起外移，越远的点退行越快——这正是哈勃定律。曲线是同一套宇宙学参数算出的膨胀速率，圆点标出当前 a。']));
+    deBlock.appendChild(h('p', { class: 'cz-range-note u-dim' }, [T('拖动尺度因子：所有星系随空间一起外移，越远的点退行越快——这正是哈勃定律。曲线是同一套宇宙学参数算出的膨胀速率，圆点标出当前 a。', "Drag the scale factor: every galaxy moves outward with space, and the farther one recedes faster — this is Hubble's law. The curve is the expansion rate computed from the same cosmological parameters; the dot marks the current a.")]));
     deBlock.appendChild(readoutBlock('darkenergy'));
-    deBlock.appendChild(photoButton('deep-darkenergy', '暗能量与加速膨胀示意'));
-    deBlock.appendChild(h('p', { class: 'cz-note' }, ['这意味着什么：1998 年，两组天文学家通过 Ia 型超新星发现宇宙膨胀在加速。把这一加速归因于"暗能量"，占宇宙总能量的 68.3%；它究竟是什么，仍是当代物理学最大的问号之一。']));
+    deBlock.appendChild(photoButton('deep-darkenergy', T('暗能量与加速膨胀示意', 'Dark energy and accelerating expansion')));
+    deBlock.appendChild(h('p', { class: 'cz-note' }, [T('这意味着什么：1998 年，两组天文学家通过 Ia 型超新星发现宇宙膨胀在加速。把这一加速归因于"暗能量"，占宇宙总能量的 68.3%；它究竟是什么，仍是当代物理学最大的问号之一。', "What this means: in 1998, two teams used Type Ia supernovae to find that cosmic expansion is accelerating. Calling this acceleration \"dark energy\" accounts for 68.3% of the universe's total energy — what it actually is remains one of the biggest open questions in modern physics.")]));
 
-    var hint = h('p', { class: 'cz-hint' }, ['拖拽旋转视角 · 滚轮缩放 · 1 / 2 / 3 切换模式 · Esc 复位']);
+    var hint = h('p', { class: 'cz-hint' }, [T('拖拽旋转视角 · 滚轮缩放 · 1 / 2 / 3 切换模式 · Esc 复位', "Drag to rotate · Scroll to zoom · 1 / 2 / 3 switch mode · Esc resets")]);
 
     stack.appendChild(gravityBlock);
     stack.appendChild(dmBlock);
     stack.appendChild(deBlock);
 
-    var panel = h('aside', { class: 'panel cz-panel cz-panel--extreme', 'aria-label': '极端宇宙控制面板' });
+    var panel = h('aside', { class: 'panel cz-panel cz-panel--extreme', 'aria-label': T('极端宇宙控制面板', 'Extreme universe control panel') });
     panel.appendChild(tabs);
     panel.appendChild(stack);
     panel.appendChild(hint);
@@ -643,7 +656,7 @@
     /* ---------------- 按钮 / 图片 ---------------- */
     function photoButton(photo, label) {
       var img = h('img', { class: 'cz-photo-img', src: photoSrc(photo), alt: label, loading: 'lazy' });
-      var btn = h('button', { class: 'cz-photo', type: 'button', 'aria-label': label + '，打开大图' });
+      var btn = h('button', { class: 'cz-photo', type: 'button', 'aria-label': label + T('，打开大图', " — open image") });
       btn.appendChild(img);
       img.addEventListener('error', function () { btn.classList.add('is-miss'); });
       btn.addEventListener('click', function () {
@@ -675,24 +688,24 @@
       var exp = Math.round(Math.log(s) / Math.LN10);
       var mant = s / Math.pow(10, exp);
       strainOut.innerHTML = mant.toFixed(1) + ' × 10<sup>' + exp + '</sup>';
-      strainOut.setAttribute('aria-label', mant.toFixed(1) + ' 乘 10 的 ' + exp + ' 次方');
+      strainOut.setAttribute('aria-label', T(mant.toFixed(1) + ' 乘 10 的 ' + exp + ' 次方', 'strain ' + mant.toFixed(1) + ' × 10^' + exp));
     }
     function updateAOut() {
       var a = Number(EX.scaleFactor);
       aOut.textContent = 'a = ' + a.toFixed(2);
-      aOut.setAttribute('aria-label', '尺度因子 ' + a.toFixed(2));
+      aOut.setAttribute('aria-label', T('尺度因子 ' + a.toFixed(2), 'Scale factor ' + a.toFixed(2)));
       aRateOut.textContent = expCurve.update(a).toFixed(2);
     }
     function updateDmReadout() {
       var m = Number(EX.dmMass);
-      massOut.innerHTML = m.toFixed(2) + ' × 10<sup>12</sup>';
-      massOut.setAttribute('aria-label', m.toFixed(2) + ' 乘 10 的 12 次方太阳质量');
+      massOut.innerHTML = m.toFixed(2);
+      massOut.setAttribute('aria-label', T(m.toFixed(2) + ' 乘 10 的 12 次方太阳质量', m.toFixed(2) + ' × 10^12 solar masses'));
       vOut.textContent = curve.update(m).toFixed(0) + ' km/s';
     }
     function syncToggles() {
-      haloBtn.textContent = '暗物质晕：' + (EX.dmHalo ? '显示' : '隐藏');
+      haloBtn.textContent = T('暗物质晕：' + (EX.dmHalo ? '显示' : '隐藏'), 'Dark matter halo: ' + (EX.dmHalo ? 'shown' : 'hidden'));
       haloBtn.setAttribute('aria-pressed', EX.dmHalo ? 'true' : 'false');
-      lensBtn.textContent = '引力透镜弧：' + (EX.dmLens ? '显示' : '隐藏');
+      lensBtn.textContent = T('引力透镜弧：' + (EX.dmLens ? '显示' : '隐藏'), 'Gravitational lensing arcs: ' + (EX.dmLens ? 'shown' : 'hidden'));
       lensBtn.setAttribute('aria-pressed', EX.dmLens ? 'true' : 'false');
     }
 
@@ -825,14 +838,14 @@
 
     var svg =
       '<svg class="cz-curve" viewBox="0 0 320 178" role="img" ' +
-      'aria-label="星系旋转曲线：观测速度在外围保持平坦；可见物质单独产生的速度随半径下降；NFW 暗物质晕的预测速度随晕质量上升">' +
+      T('aria-label="星系旋转曲线：观测速度在外围保持平坦；可见物质单独产生的速度随半径下降；NFW 暗物质晕的预测速度随晕质量上升">', "aria-label=\"Galaxy rotation curve: observed speeds stay flat in the outskirts; the speed from visible matter alone falls with radius; the NFW dark matter halo prediction rises with halo mass\">") +
       '<g class="cz-curve-grid" aria-hidden="true">' + grid + '</g>' +
       '<line class="axis" x1="' + x0 + '" y1="' + y0 + '" x2="' + x1 + '" y2="' + y0 + '"/>' +
       '<line class="axis" x1="' + x0 + '" y1="' + y1 + '" x2="' + x0 + '" y2="' + y0 + '"/>' +
       '<polyline class="cz-curve-vis" points="' + vis.join(' ') + '"/>' +
       '<polyline class="cz-curve-nfw" data-role="nfw" points=""/>' +
       '<polyline class="cz-curve-obs" points="' + obs.join(' ') + '"/>' +
-      '<text class="cz-curve-ax" x="' + ((x0 + x1) / 2) + '" y="174" text-anchor="middle">半径（kpc）</text>' +
+      '<text class="cz-curve-ax" x="' + ((x0 + x1) / 2) + T('" y="174" text-anchor="middle">半径（kpc）</text>', "\" y=\"174\" text-anchor=\"middle\">Radius (kpc)</text>") +
       '<text class="cz-curve-ax" x="' + (x0 - 2) + '" y="10" text-anchor="middle">km/s</text>' +
       '</svg>';
 
@@ -884,13 +897,13 @@
 
     var svg =
       '<svg class="cz-curve" viewBox="0 0 320 178" role="img" ' +
-      'aria-label="膨胀速率随尺度因子的变化：物质主导期膨胀被拖慢，暗能量主导后转为加速">' +
+      T('aria-label="膨胀速率随尺度因子的变化：物质主导期膨胀被拖慢，暗能量主导后转为加速">', "aria-label=\"Expansion rate versus scale factor: expansion slows in the matter-dominated era, then accelerates once dark energy dominates\">") +
       '<g class="cz-curve-grid" aria-hidden="true">' + grid + '</g>' +
       '<line class="axis" x1="' + x0 + '" y1="' + y0 + '" x2="' + x1 + '" y2="' + y0 + '"/>' +
       '<line class="axis" x1="' + x0 + '" y1="' + y1 + '" x2="' + x0 + '" y2="' + y0 + '"/>' +
       '<polyline class="cz-curve-acc" points="' + pts.join(' ') + '"/>' +
       '<circle class="cz-curve-dot" data-role="dot" r="3" cx="' + sx(1).toFixed(1) + '" cy="' + sy(rate(1)).toFixed(1) + '"/>' +
-      '<text class="cz-curve-ax" x="' + ((x0 + x1) / 2) + '" y="174" text-anchor="middle">尺度因子 a</text>' +
+      '<text class="cz-curve-ax" x="' + ((x0 + x1) / 2) + T('" y="174" text-anchor="middle">尺度因子 a</text>', "\" y=\"174\" text-anchor=\"middle\">Scale factor a</text>") +
       '<text class="cz-curve-ax" x="' + (x0 - 2) + '" y="10" text-anchor="middle">ȧ / H₀</text>' +
       '</svg>';
 

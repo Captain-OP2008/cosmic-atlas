@@ -25,6 +25,7 @@
   'use strict';
 
   const THREE = window.THREE;
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
   const U = COSMOS.util;
   const TAU = Math.PI * 2;
 
@@ -614,24 +615,28 @@
      * ============================================================ */
     const LABELS = [
       {
-        key: 'great', name: '巨引源', en: 'GREAT ATTRACTOR', cls: '',
+        key: 'great', name: '巨引源', en: 'GREAT ATTRACTOR', nameEn: 'Great Attractor', cls: '',
         pos: new THREE.Vector3(7.5, 6.5, -2.0),
-        desc: '拉尼亚凯亚的引力中心，约 2.2 亿光年外。银河系正以约 600 km/s 向它运动。'
+        desc: '拉尼亚凯亚的引力中心，约 2.2 亿光年外。银河系正以约 600 km/s 向它运动。',
+        descEn: 'The gravitational center of Laniakea, about 220 million light-years away. The Milky Way is falling toward it at roughly 600 km/s.'
       },
       {
-        key: 'milky', name: '银河系', en: 'MILKY WAY', cls: 'is-milky',
+        key: 'milky', name: '银河系', en: 'MILKY WAY', nameEn: 'Milky Way', cls: 'is-milky',
         pos: new THREE.Vector3(22.5, 6.8, 11.5),
-        desc: '我们所在的星系，位于拉尼亚凯亚外缘的一条纤维上。图中红点即此。'
+        desc: '我们所在的星系，位于拉尼亚凯亚外缘的一条纤维上。图中红点即此。',
+        descEn: 'Our own galaxy, on a filament at the outskirts of Laniakea. It is the red dot in this view.'
       },
       {
-        key: 'virgo', name: '室女座星系团', en: 'VIRGO CLUSTER', cls: '',
+        key: 'virgo', name: '室女座星系团', en: 'VIRGO CLUSTER', nameEn: 'Virgo Cluster', cls: '',
         pos: new THREE.Vector3(9.0, -10.5, 30.0),
-        desc: '离我们最近的星系团，约 5,400 万光年，包含上千个星系。'
+        desc: '离我们最近的星系团，约 5,400 万光年，包含上千个星系。',
+        descEn: 'The nearest galaxy cluster to us, about 54 million light-years away, with more than a thousand galaxies.'
       },
       {
-        key: 'title', name: '拉尼亚凯亚超星系团', en: 'LANIAKEA SUPERCLUSTER', cls: 'is-title',
+        key: 'title', name: '拉尼亚凯亚超星系团', en: 'LANIAKEA SUPERCLUSTER', nameEn: 'Laniakea Supercluster', cls: 'is-title',
         pos: new THREE.Vector3(-1.0, -16.0, 0),
-        desc: '直径约 5.2 亿光年，约 10 万个星系；2014 年由星系流场定义。'
+        desc: '直径约 5.2 亿光年，约 10 万个星系；2014 年由星系流场定义。',
+        descEn: 'About 520 million light-years across, containing roughly 100,000 galaxies. Defined in 2014 by the flow field of galaxies.'
       }
     ];
 
@@ -649,17 +654,17 @@
       txt.className = 'lka-txt';
       const nm = document.createElement('b');
       nm.className = 'lka-name';
-      nm.textContent = item.name;
+      nm.textContent = T(item.name, item.nameEn || item.en);
       const en = document.createElement('i');
       en.className = 'lka-en';
-      en.textContent = item.en;
+      en.textContent = T(item.en, item.name);
       txt.appendChild(nm);
       txt.appendChild(en);
       el.appendChild(dot);
       el.appendChild(txt);
       const tip = document.createElement('span');
       tip.className = 'lka-tip';
-      tip.textContent = item.desc;
+      tip.textContent = T(item.desc, item.descEn || item.desc);
       el.appendChild(tip);
       labelRoot.appendChild(el);
       item.el = el;
@@ -845,6 +850,7 @@
     return {
       scene: scene,
       camera: camera,
+      arrowKeys: true,
       update: update,
       resize: resize,
       reset: reset,

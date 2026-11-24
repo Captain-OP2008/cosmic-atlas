@@ -324,6 +324,97 @@
     return new THREE.Mesh(geo, null);
   }
 
+  /* 全屏 fbm 层的离屏低分辨率渲染
+   * ------------------------------------------------------------
+   * 星云本体是两片覆盖全屏的 ShaderMaterial 平面（每个像素约 23 次 fbm），
+   * 是 07/08/09/10 四章唯一的大头。把这两片移进独立场景，先按 scale
+   * 渲染进一张 HalfFloat 渲染目标，再用 additive 全屏四边形贴回主场景：
+   * 片元计算量降到 scale²，星云是低频画面，视觉上看不出差别。
+   *
+   * opts: { planes:[Mesh], scene, camera, renderer, scale, renderOrder }
+   * 返回 { quad, render(), dispose() }；调用方在 update() 里调用 render()。
+   */
+  function makeLowResLayer(opts) {
+    const planes = opts.planes || [];
+    const mainScene = opts.scene;
+    const camera = opts.camera;
+    const renderer = opts.renderer;
+    const scale = opts.scale || 0.5;
+    const order = opts.renderOrder === undefined ? 0 : opts.renderOrder;
+    /* every>1 时每 N 帧才重渲一次离屏层（慢速演化的大气/星云够用），其余帧复用上一张 */
+    const every = Math.max(1, opts.every || 1);
+    let tick = 0;
+
+    const bgScene = new THREE.Scene();
+    for (let i = 0; i < planes.length; i++) bgScene.add(planes[i]);
+
+    const rt = new THREE.WebGLRenderTarget(2, 2, {
+      type: THREE.HalfFloatType,
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      depthBuffer: false,
+      stencilBuffer: false,
+      generateMipmaps: false
+    });
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { tSrc: { value: rt.texture } },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main () { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D tSrc;',
+        'varying vec2 vUv;',
+        'void main () { gl_FragColor = vec4(texture2D(tSrc, vUv).rgb, 1.0); }'
+      ].join('\n'),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      depthWrite: false
+    });
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+    quad.frustumCulled = false;
+    quad.renderOrder = order;
+    mainScene.add(quad);
+
+    const _sz = new THREE.Vector2();
+    let curW = 0;
+    let curH = 0;
+    let disposed = false;
+
+    function render() {
+      if (disposed) return;
+      tick++;
+      if (every > 1 && tick > every && tick % every !== 0) return;
+      renderer.getDrawingBufferSize(_sz);
+      const w = Math.max(2, Math.round(_sz.x * scale));
+      const hh = Math.max(2, Math.round(_sz.y * scale));
+      if (w !== curW || hh !== curH) {
+        curW = w;
+        curH = hh;
+        rt.setSize(w, hh);
+      }
+      const prevAuto = renderer.autoClear;
+      renderer.autoClear = false;
+      renderer.setRenderTarget(rt);
+      renderer.clear(true, false, false);
+      renderer.render(bgScene, camera);
+      renderer.setRenderTarget(null);
+      renderer.autoClear = prevAuto;
+    }
+
+    function dispose() {
+      if (disposed) return;
+      disposed = true;
+      rt.dispose();
+      quad.geometry.dispose();
+      mat.dispose();
+    }
+
+    return { quad: quad, scene: bgScene, render: render, dispose: dispose };
+  }
+
   /* ============================================================
    * 事件总线（v2）
    * ============================================================ */
@@ -513,7 +604,7 @@
   COSMOS.util = {
     clamp, lerp, smoothstep, damp, ease,
     rand, randRange, reseed,
-    disposeGroup, makeCamera, fitCamera, makeFullscreenQuad,
+    disposeGroup, makeCamera, fitCamera, makeFullscreenQuad, makeLowResLayer,
     pick: pick, project: project, raycaster: raycaster,
     num: num, richText: richText
   };

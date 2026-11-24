@@ -1507,6 +1507,7 @@
     return {
       scene: scene,
       camera: camera,
+      arrowKeys: true,
       update: update,
       resize: resize,
       enter: enter,

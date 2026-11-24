@@ -108,7 +108,9 @@
     const bhGroup = new THREE.Group();
     root.add(bhGroup);
 
-    const BH_STEPS = isLow ? 72 : (isMedium ? 96 : 128);
+    /* 128 步在核显上会把整章压到 ~40fps；96 步（low 64）对阴影边缘几乎无感，
+       配合下面 diskSample 降一档噪声，帧率回到预算内 */
+    const BH_STEPS = isLow ? 64 : (isMedium ? 80 : 96);
 
     const BH_FS = `
 precision highp float;
@@ -176,14 +178,14 @@ vec3 diskSample(vec3 p, vec3 rd, float r, float graze) {
   float lr = log(r);
 
   // 大尺度云带（低频，给盘以明暗分区）
-  float low = fbm(vec3(cos(ang) * 0.55, sin(ang) * 0.55, lr * 4.2), 3, 2.0, 0.5);
+  float low = fbm(vec3(cos(ang) * 0.55, sin(ang) * 0.55, lr * 4.2), 2, 2.0, 0.5);
 
   // 丝状结构：径向高频 + 角向低频，并沿螺旋弯曲 —— 细丝顺流被拉长
-  float warp = fbm(vec3(cos(ang) * 1.5, sin(ang) * 1.5, lr * 2.0 + uTime * 0.015), 3, 2.0, 0.5);
-  float warp2 = fbm(vec3(cos(ang) * 4.2, sin(ang) * 4.2, lr * 6.5), 3, 2.0, 0.5);
+  float warp = fbm(vec3(cos(ang) * 1.5, sin(ang) * 1.5, lr * 2.0 + uTime * 0.015), 2, 2.0, 0.5);
+  float warp2 = fbm(vec3(cos(ang) * 4.2, sin(ang) * 4.2, lr * 6.5), 2, 2.0, 0.5);
   float spiral = ang * 0.5 + lr * 3.0 + warp * 3.5;
   float radial = lr * 52.0 + warp * 14.0 + warp2 * 5.0;
-  float rid = ridged(vec3(cos(spiral) * 0.85, sin(spiral) * 0.85, radial), 5);
+  float rid = ridged(vec3(cos(spiral) * 0.85, sin(spiral) * 0.85, radial), 3);
   float fiber = ridged(vec3(cos(spiral) * 1.6, sin(spiral) * 1.6, radial * 2.7), 2);
   // 沿角向的大尺度明暗斑块，打断规则环
   float patchy = fbm(vec3(cos(ang) * 2.2, sin(ang) * 2.2, lr * 8.0), 2, 2.0, 0.5) * 0.5 + 0.5;
@@ -1246,7 +1248,12 @@ void main() {
       nsBack.material.opacity = 0.35 * fade.neutronstar;
     }
 
+    /* 弧线相位是常量，提到闭包外，避免每帧新建数组（§8：update 里禁止 new） */
+    const WD_PHASES = [0.0, 2.1, 4.2];
+
     function updateWhitedwarf(t, dt) {
+      /* 白矮星不可见时整段跳过：黑洞/中子星模式下它原本也在跑，纯浪费 */
+      if (fade.whitedwarf < 0.004) return;
       wdGroup.rotation.y += dt * 0.05;
 
       // 主星自转 + 缓慢冷却
@@ -1265,10 +1272,9 @@ void main() {
       wdCompGlow.position.copy(_comp);
 
       // 磁力线 / 吸积流弧：主星极区弯向伴星（GPU 贝塞尔）
-      const phases = [0.0, 2.1, 4.2];
       for (let s = 0; s < WD_STRANDS; s++) {
         const u = wdStrandUniforms[s];
-        const a0 = t * 0.10 + phases[s];
+        const a0 = t * 0.10 + WD_PHASES[s];
         _ca.set(Math.cos(a0) * 0.52, 0.84, Math.sin(a0) * 0.52);
         _cb.copy(_comp);
         _cc.copy(_ca).add(_cb).multiplyScalar(0.5);
@@ -1299,7 +1305,7 @@ void main() {
         }
       }
       wdPointGeo.attributes.position.needsUpdate = true;
-      wdPointGeo.computeBoundingSphere();
+      /* 点云已设 frustumCulled=false，不再每帧重算包围球（原来每帧新建一个 Sphere） */
     }
 
     function update(t, dt, p) {

@@ -16,10 +16,10 @@
 <body>
 
 <!-- ============ 跳到正文 ============ -->
-<a class="skip-link" href="#scroll">跳到正文</a>
+<a class="skip-link" href="#scroll" data-i18n="skip">跳到正文</a>
 
 <!-- ============ WebGL 画布 ============ -->
-<canvas id="gl" aria-label="宇宙场景实时渲染画布"></canvas>
+<canvas id="gl" aria-label="宇宙场景实时渲染画布" data-i18n-aria="canvas-aria"></canvas>
 
 <!-- ============ 全屏质感层：只保留暗角 + 轻颗粒 ============ -->
 <div class="fx-layer fx-vignette" aria-hidden="true"></div>
@@ -33,9 +33,9 @@
       <span class="loader-ring loader-ring-2"></span>
     </div>
     <div class="loader-title">COSMOS<em>ATLAS</em></div>
-    <div class="loader-sub">宇宙图谱 · 从太阳系到可观测宇宙边缘</div>
+    <div class="loader-sub" data-i18n="loader-sub">宇宙图谱 · 从太阳系到可观测宇宙边缘</div>
     <div class="loader-bar"><span id="loader-bar-fill"></span></div>
-    <div class="loader-hint" id="loader-hint">正在绘制星空…</div>
+    <div class="loader-hint" id="loader-hint" data-i18n="loader-hint">正在绘制星空…</div>
   </div>
 </div>
 
@@ -55,7 +55,7 @@
 
 <!-- ============ HUD ============ -->
 <header class="hud">
-  <a class="brand" href="#ch-hero" data-goto="0" aria-label="回到序章">
+  <a class="brand" href="#ch-hero" data-goto="0" aria-label="回到序章" data-i18n-aria="brand-aria">
     <span class="brand-dot"></span>
     <span class="brand-txt">COSMOS<em>ATLAS</em></span>
   </a>
@@ -65,11 +65,12 @@
     <span class="hud-coord" id="hud-coord">RA 00h00m · DEC +00°00′</span>
     <span class="hud-sep"></span>
     <span class="hud-chapter" id="hud-chapter">00 / 12</span>
+    <button class="lang-toggle" id="lang-toggle" type="button" aria-label="切换到英文版">EN</button>
   </div>
 </header>
 
 <!-- ============ 章节导航 ============ -->
-<nav id="nav" class="nav" aria-label="章节导航"></nav>
+<nav id="nav" class="nav" aria-label="章节导航" data-i18n-aria="nav-aria"></nav>
 
 <!-- ============ 滚动进度 ============ -->
 <div class="rail" aria-hidden="true"><div class="rail-fill" id="rail-fill"></div></div>
@@ -115,7 +116,7 @@
            data-part="V · 人类探索" data-h="240" data-coord="RA 22h57m · DEC −29°37′" id="ch-future"></section>
 
   <!-- 终章 -->
-  <section class="chapter ch-finale" data-stage="nebula" data-num="10" data-name="暗淡蓝点" data-en="PALE BLUE DOT"
+  <section class="chapter ch-finale" data-stage="paleblue" data-num="10" data-name="暗淡蓝点" data-en="PALE BLUE DOT"
            data-part="终章" data-h="100" data-coord="RA 16h04m · DEC +45°52′" id="ch-finale"></section>
 
 </main>
@@ -127,22 +128,25 @@
 </div>
 
 <noscript>
-  <div class="noscript">本站需要 JavaScript 与 WebGL 才能展开三维宇宙。请开启后刷新。</div>
+  <div class="noscript" data-i18n="noscript">本站需要 JavaScript 与 WebGL 才能展开三维宇宙。请开启后刷新。</div>
 </noscript>
 
 <!-- ============ 脚本（经典 script，file:// 下可直接运行）============ -->
 <script src="vendor/three.global.js"></script>
 <script src="js/glsl-lib.js"></script>
 <script src="js/lib-core.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/tex-solar.js"></script>
 
 <!-- 数据与文案 -->
 <script src="js/data.js"></script>
+<script src="js/data-en.js"></script>
 <script src="js/content-core.js"></script>
 <script src="js/content-solar.js"></script>
 <script src="js/content-deep.js"></script>
 <script src="js/content-cosmos.js"></script>
 <script src="js/content-human.js"></script>
+<script src="js/content-en.js"></script>
 
 <!-- 场景模块 -->
 <script src="js/scene-ambient.js"></script>
@@ -155,6 +159,7 @@
 <script src="js/scene-galaxies.js"></script>
 <script src="js/scene-extreme.js"></script>
 <script src="js/scene-explore.js"></script>
+<script src="js/scene-finale-earth.js"></script>
 
 <!-- 章节组件（DOM 控件） -->
 <script src="js/feat-solar.js"></script>

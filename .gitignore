@@ -19,3 +19,6 @@ desktop.ini
 .DS_Store
 .vscode/
 .idea/
+
+# 性能与场景审计记录（开发过程产物）
+_perf/

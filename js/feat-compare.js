@@ -9,6 +9,8 @@
 (function (COSMOS) {
   'use strict';
 
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
+
   var D = COSMOS.DATA || {};
   var h = COSMOS.dom.h;
   var num = COSMOS.util.num;
@@ -58,17 +60,17 @@
 
     /* ---------- 顶部 ---------- */
     var head = h('div', { class: 'cmp-head' }, [
-      h('p', { class: 'u-kicker', text: '04 · 行星对比 / 实验台' }),
-      h('p', { class: 'cmp-guide u-dim', text: (content && content.hint) || '切换标签，比较大小、重力与大气。' })
+      h('p', { class: 'u-kicker', text: T('04 · 行星对比 / 实验台', '04 · Planet Comparison / Lab') }),
+      h('p', { class: 'cmp-guide u-dim', text: (content && content.hint) || T('切换标签，比较大小、重力与大气。', 'Switch tabs to compare size, gravity and atmosphere.') })
     ]);
 
     /* ---------- tabs ---------- */
     var TABS = [
-      { id: 'size', label: '大小', desc: '按真实直径比例' },
-      { id: 'gravity', label: '重力', desc: '你在各行星上的体重' },
-      { id: 'atmos', label: '大气', desc: '成分与气压' }
+      { id: 'size', label: T('大小', 'Size'), desc: T('按真实直径比例', 'True diameter ratio') },
+      { id: 'gravity', label: T('重力', 'Gravity'), desc: T('你在各行星上的体重', 'Your weight on each planet') },
+      { id: 'atmos', label: T('大气', 'Atmosphere'), desc: T('成分与气压', 'Composition and pressure') }
     ];
-    var tablist = h('div', { class: 'tabs cmp-tabs', role: 'tablist', 'aria-label': '行星对比维度' });
+    var tablist = h('div', { class: 'tabs cmp-tabs', role: 'tablist', 'aria-label': T('行星对比维度', 'Planet comparison dimensions') });
     var tabBtn = {};
     var panels = {};
     var panelWrap = h('div', { class: 'cmp-panels' });
@@ -130,7 +132,7 @@
             class: 'chip cmp-chip' + (p.id === currentId ? ' is-on' : ''),
             type: 'button',
             'aria-pressed': p.id === currentId ? 'true' : 'false',
-            'aria-label': p.name + '，直径 ' + num(p.diameterKm) + ' 公里',
+            'aria-label': T(p.name + '，直径 ' + num(p.diameterKm) + ' 公里', p.name + ', ' + num(p.diameterKm) + ' km across'),
             text: p.name
           });
           b.addEventListener('click', function () { onPick(p.id, map); });
@@ -160,7 +162,7 @@
       C.planet = id;
       syncChips(map, id);
       renderSize();
-    }, '选择要对比的行星');
+    }, T('选择要对比的行星', 'Choose a planet to compare'));
     var sizeSvg = svg('svg', { class: 'cmp-size-svg', viewBox: '0 0 760 412', role: 'img', 'aria-label': '' });
     var earthCircle = svg('circle', { cx: 220, cy: 200, r: 100, class: 'cmp-circle cmp-circle-earth' });
     var otherCircle = svg('circle', { cx: 545, cy: 200, r: 60, class: 'cmp-circle cmp-circle-other' });
@@ -192,15 +194,15 @@
       var rOther = R * ratio;
       earthCircle.setAttribute('r', rEarth.toFixed(2));
       otherCircle.setAttribute('r', rOther.toFixed(2));
-      setText(earthLabel, '地球');
+      setText(earthLabel, T('地球', 'Earth'));
       setText(otherLabel, p.name);
       setText(earthSub, num(EARTH_D) + ' km');
       setText(otherSub, num(p.diameterKm) + ' km');
       var cap = p.id === 'earth'
-        ? '地球与自身对比：直径 ' + num(p.diameterKm) + ' km。'
-        : p.name + '直径 ' + num(p.diameterKm) + ' km，是地球的 ' + ratio.toFixed(2) + ' 倍。';
+        ? T('地球与自身对比：直径 ' + num(p.diameterKm) + ' km。', 'Earth compared with itself: ' + num(p.diameterKm) + ' km across.')
+        : T(p.name + '直径 ' + num(p.diameterKm) + ' km，是地球的 ' + ratio.toFixed(2) + ' 倍。', p.name + ': ' + num(p.diameterKm) + ' km across — ' + ratio.toFixed(2) + '× Earth’s diameter.');
       setText(sizeCap, cap);
-      sizeSvg.setAttribute('aria-label', '地球与' + p.name + '的直径比例示意，' + cap);
+      sizeSvg.setAttribute('aria-label', T('地球与' + p.name + '的直径比例示意，' + cap, 'Diameter ratio of Earth and ' + p.name + ': ' + cap));
     }
 
     /* ============================================================
@@ -216,11 +218,11 @@
       class: 'cmp-mass-input u-mono', id: 'cmp-mass', type: 'number',
       min: '1', max: '300', step: '1', value: String(C.massKg), inputmode: 'decimal'
     });
-    massInput.setAttribute('aria-label', '输入体重，单位千克');
+    massInput.setAttribute('aria-label', T('输入体重，单位千克', 'Enter mass in kilograms'));
     var massRow = h('div', { class: 'cmp-mass-row' }, [
-      h('label', { class: 'u-mono', 'for': 'cmp-mass', text: '体重（质量）' }),
+      h('label', { class: 'u-mono', 'for': 'cmp-mass', text: T('体重（质量）', 'Mass') }),
       h('span', { class: 'cmp-mass-wrap' }, [massInput, h('span', { class: 'u-mono', text: 'kg' })]),
-      h('span', { class: 'u-dim cmp-mass-hint', text: '质量在哪儿都一样，重量会变。' })
+      h('span', { class: 'u-dim cmp-mass-hint', text: T('质量在哪儿都一样，重量会变。', 'Mass is the same everywhere; weight changes.') })
     ]);
     massInput.value = String(C.massKg);
 
@@ -243,7 +245,7 @@
       })(PLANETS[pj]);
     }
     var gSum = h('p', { class: 'cmp-g-sum' });
-    var gNote = h('p', { class: 'u-dim cmp-g-note', text: '重量 = 质量 × 表面重力。1 千克力（kgf）= 9.807 N，就是地球上 1 千克质量受到的重量。' });
+    var gNote = h('p', { class: 'u-dim cmp-g-note', text: T('重量 = 质量 × 表面重力。1 千克力（kgf）= 9.807 N，就是地球上 1 千克质量受到的重量。', 'Weight = mass × surface gravity. 1 kilogram-force (kgf) = 9.807 N — the weight of a 1 kg mass on Earth.') });
     gravityPanel.appendChild(h('div', { class: 'cmp-panel-body' }, [
       massRow,
       h('div', { class: 'cmp-g-scale u-mono', 'aria-hidden': 'true' }, [
@@ -268,11 +270,11 @@
       var planet = byId(C.planet, PLANETS);
       var a = planet || mars || EARTH;
       var wn = m * a.gravity;
-      var line = '在' + a.name + '上，' + m + ' kg 的体重是 ' + num(wn.toFixed(0)) + ' N（' + (wn / G0).toFixed(1) + ' kgf）';
+      var line = T('在' + a.name + '上，' + m + ' kg 的体重是 ' + num(wn.toFixed(0)) + ' N（' + (wn / G0).toFixed(1) + ' kgf）', 'On ' + a.name + ', a mass of ' + m + ' kg weighs ' + num(wn.toFixed(0)) + ' N (' + (wn / G0).toFixed(1) + ' kgf)');
       if (mars && a.id !== 'mars') {
-        line += '；同样质量在火星上是 ' + num((m * mars.gravity).toFixed(0)) + ' N。';
+        line += T('；同样质量在火星上是 ' + num((m * mars.gravity).toFixed(0)) + ' N。', '; the same mass weighs ' + num((m * mars.gravity).toFixed(0)) + ' N on Mars.');
       } else {
-        line += '。';
+        line += T('。', '.');
       }
       setText(gSum, line);
     }
@@ -298,7 +300,7 @@
       C.atmo = id;
       syncChips(map, id);
       renderAtmo();
-    }, '选择要查看大气的行星');
+    }, T('选择要查看大气的行星', 'Choose a planet to view its atmosphere'));
 
     var atmoBarEl = h('div', { class: 'cmp-atmo-bar', 'aria-hidden': 'true' });
     var atmoSegs = [];
@@ -354,15 +356,15 @@
         setText(atmoLegendRows[s2].nm, item.name);
         setText(atmoLegendRows[s2].pc, (item.pct < 1 ? item.pct.toFixed(3) : item.pct.toFixed(2)) + '%');
       }
-      setText(atmoTitle, p.name + '（' + p.en + '）大气成分 · 合计 ' + total.toFixed(2) + '%');
-      setText(atmoNote, p.atmosphereNote || '本数据表暂无该行星的气压说明。');
-      var earthTxt = '地球：氮 78.08%、氧 20.95%，其余为氩与二氧化碳等。';
+      setText(atmoTitle, T(p.name + '（' + p.en + '）大气成分 · 合计 ' + total.toFixed(2) + '%', p.name + ' atmosphere · ' + total.toFixed(2) + '% total'));
+      setText(atmoNote, p.atmosphereNote || T('本数据表暂无该行星的气压说明。', 'No surface-pressure note for this planet in the dataset.'));
+      var earthTxt = T('地球：氮 78.08%、氧 20.95%，其余为氩与二氧化碳等。', 'Earth’s air: 78.08% nitrogen, 20.95% oxygen; argon, carbon dioxide and other gases make up the rest.');
       var jupiter = byId('jupiter', PLANETS);
-      var extra = p.id === 'earth' ? '' : '对照 ' + earthTxt;
+      var extra = p.id === 'earth' ? '' : T('对照 ' + earthTxt, 'For comparison — ' + earthTxt);
       if (p.id !== 'earth' && jupiter && p.id !== 'jupiter') {
-        extra += ' 木星、土星则以氢、氦为主。';
+        extra += T(' 木星、土星则以氢、氦为主。', ' Jupiter and Saturn are mostly hydrogen and helium.');
       }
-      if (p.moons === 0 && p.id === 'mercury') extra = '水星几乎没有大气，严格说是外逸层。';
+      if (p.moons === 0 && p.id === 'mercury') extra = T('水星几乎没有大气，严格说是外逸层。', 'Mercury has almost no atmosphere — strictly speaking, only an exosphere.');
       setText(atmoTable, extra);
     }
 

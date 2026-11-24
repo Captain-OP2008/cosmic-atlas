@@ -17,6 +17,7 @@
 
   const doc = document;
   const U = COSMOS.util;
+  const T = (COSMOS.i18n && COSMOS.i18n.T) || function (zh) { return zh; };
   const h = (COSMOS.dom && COSMOS.dom.h) || COSMOS.h;
   const richText = (COSMOS.util && COSMOS.util.richText) || (COSMOS.dom && COSMOS.dom.richText) || function (s) { return String(s == null ? '' : s); };
 
@@ -143,7 +144,7 @@
     const scroll = t('div', 'hero-scroll');
     scroll.setAttribute('aria-hidden', 'true');
     scroll.appendChild(t('span', 'hero-scroll-rule'));
-    scroll.appendChild(t('span', 'hero-scroll-label', '点击顶部标签切换章节'));
+    scroll.appendChild(t('span', 'hero-scroll-label', T('点击顶部标签切换章节', 'Use the chapter tabs to navigate')));
     inner.appendChild(scroll);
 
     section.appendChild(inner);
@@ -176,7 +177,7 @@
     const back = t('button', 'btn btn-ghost');
     back.type = 'button';
     back.dataset.goto = 'hero';
-    back.appendChild(t('span', 'btn-label', '回到开头'));
+    back.appendChild(t('span', 'btn-label', T('回到开头', 'Back to the start')));
     back.appendChild(t('span', 'btn-arrow', '↑'));
     actions.appendChild(back);
     copy.appendChild(actions);
@@ -187,7 +188,7 @@
 
   function buildCredits() {
     const box = t('div', 'credits');
-    box.appendChild(t('p', 'credits-title', '影像与数据来源'));
+    box.appendChild(t('p', 'credits-title', T('影像与数据来源', 'Images & Data Sources')));
 
     const list = t('ul', 'credits-list');
     const sources = (COSMOS.DATA && COSMOS.DATA.sources) || [];
@@ -203,12 +204,12 @@
     const tex = COSMOS.TEX_SOURCES || [];
     if (tex.length) {
       const li = t('li', 'credits-item');
-      li.appendChild(t('span', 'credits-name', '行星贴图'));
-      li.appendChild(t('span', 'credits-note', 'Solar System Scope（CC BY 4.0），本地打包'));
+      li.appendChild(t('span', 'credits-name', T('行星贴图', 'Planet textures')));
+      li.appendChild(t('span', 'credits-note', T('Solar System Scope（CC BY 4.0），本地打包', 'Solar System Scope (CC BY 4.0), bundled locally')));
       list.appendChild(li);
     }
     box.appendChild(list);
-    box.appendChild(t('p', 'credits-foot', '本站不联网、不追踪；所有影像均存储于本地。'));
+    box.appendChild(t('p', 'credits-foot', T('本站不联网、不追踪；所有影像均存储于本地。', 'No network requests, no tracking — all imagery is stored locally.')));
     return box;
   }
 
@@ -216,10 +217,10 @@
   const FLOW_CHAPTERS = { compare: 1, history: 1, vehicles: 1, future: 1 };
   /* 文档流章节的右栏影像：让首屏不是纯文字，同时给实验室一个视觉锚点 */
   const FLOW_BANNERS = {
-    compare: { src: 'assets/photos/human-blue-marble.jpg', cap: '阿波罗 17 号 · 蓝色弹珠，1972 · NASA' },
-    history: { src: 'assets/photos/human-apollo11.jpg', cap: '阿波罗 11 号 · 月面，1969 · NASA' },
-    vehicles: { src: 'assets/photos/rocket-starship.jpg', cap: '星舰 HLS · 月面概念图 · NASA' },
-    future: { src: 'assets/photos/future-mars.jpg', cap: '火星基地概念图 · NASA' }
+    compare: { src: 'assets/photos/human-blue-marble.jpg', cap: T('阿波罗 17 号 · 蓝色弹珠，1972 · NASA', 'Apollo 17 · Blue Marble, 1972 · NASA') },
+    history: { src: 'assets/photos/human-apollo11.jpg', cap: T('阿波罗 11 号 · 月面，1969 · NASA', 'Apollo 11 · Lunar surface, 1969 · NASA') },
+    vehicles: { src: 'assets/photos/rocket-starship.jpg', cap: T('星舰 HLS · 月面概念图 · NASA', 'Starship HLS · Lunar concept · NASA') },
+    future: { src: 'assets/photos/future-mars.jpg', cap: T('火星基地概念图 · NASA', 'Mars base concept · NASA') }
   };
 
   function renderStandard(section, c) {
@@ -291,7 +292,7 @@
       const c = (COSMOS.CONTENT || {})[id === 'compare' ? 'compare' : section.id.replace('ch-', '')] || {};
       const factory = COSMOS.widgets && COSMOS.widgets[id];
       if (typeof factory !== 'function') {
-        el.appendChild(t('p', 'u-dim widget-missing', '组件 ' + id + ' 尚未载入'));
+        el.appendChild(t('p', 'u-dim widget-missing', T('组件 ' + id + ' 尚未载入', 'Widget ' + id + ' is not loaded')));
         return null;
       }
       try {
@@ -299,7 +300,7 @@
         return { el: el, api: api || null };
       } catch (e) {
         if (window.console && console.warn) console.warn('[COSMOS] widget "' + id + '" 初始化失败', e);
-        el.appendChild(t('p', 'u-dim widget-missing', '组件 ' + id + ' 初始化失败'));
+        el.appendChild(t('p', 'u-dim widget-missing', T('组件 ' + id + ' 初始化失败', 'Widget ' + id + ' failed to initialize')));
         return null;
       }
     });
@@ -308,7 +309,7 @@
   /* ============================================================
    * 导航 / HUD
    * ============================================================ */
-  const PART_KEYS = { '序章': 0, 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, '终章': 6 };
+  const PART_KEYS = { '序章': 0, 'Prologue': 0, 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, '终章': 6, 'Finale': 6 };
 
   function renderNav() {
     navEl = doc.getElementById('nav');
@@ -316,7 +317,7 @@
     clear(navEl);
     navItems = [];
     navEl.setAttribute('role', 'tablist');
-    navEl.setAttribute('aria-label', '章节标签');
+    navEl.setAttribute('aria-label', T('章节标签', 'Chapter tabs'));
     sections.forEach(function (section, i) {
       const b = t('button', 'nav-item');
       b.type = 'button';
@@ -374,20 +375,28 @@
    * 灯箱 / 抽屉（各章节组件可复用）
    * ============================================================ */
   let lightbox = null;
+  let lightboxOpener = null;
+
+  /* 灯箱内可聚焦元素（用于 Tab 焦点陷阱） */
+  function lightboxFocusables(root) {
+    return Array.prototype.slice.call(
+      root.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')
+    ).filter(function (el) { return !el.hidden && el.offsetParent !== null; });
+  }
 
   function ensureLightbox() {
     if (lightbox) return lightbox;
     lightbox = t('div', 'lightbox');
     lightbox.setAttribute('role', 'dialog');
     lightbox.setAttribute('aria-modal', 'true');
-    lightbox.setAttribute('aria-label', '影像查看');
+    lightbox.setAttribute('aria-label', T('影像查看', 'Image viewer'));
     lightbox.hidden = true;
     const img = t('img', 'lightbox-img');
     img.alt = '';
     const cap = t('p', 'lightbox-cap');
     const close = t('button', 'lightbox-close');
     close.type = 'button';
-    close.setAttribute('aria-label', '关闭');
+    close.setAttribute('aria-label', T('关闭', 'Close'));
     close.textContent = '×';
     lightbox.appendChild(img);
     lightbox.appendChild(cap);
@@ -403,17 +412,42 @@
   function openLightbox(src, caption) {
     const lb = ensureLightbox();
     const img = lb.querySelector('.lightbox-img');
+    const active = doc.activeElement;
+    lightboxOpener = active && active !== doc.body && !lb.contains(active) ? active : null;
     img.src = src;
     img.alt = caption || '';
     lb.querySelector('.lightbox-cap').textContent = caption || '';
     lb.hidden = false;
     doc.documentElement.classList.add('has-lightbox');
+    // 焦点移入对话框，关闭后归还（WCAG 2.4.3）
+    const close = lb.querySelector('.lightbox-close');
+    if (close) close.focus();
   }
 
   function closeLightbox() {
     if (!lightbox || lightbox.hidden) return;
     lightbox.hidden = true;
     doc.documentElement.classList.remove('has-lightbox');
+    const back = lightboxOpener;
+    lightboxOpener = null;
+    if (back && back.focus && doc.contains(back)) back.focus();
+  }
+
+  /* Tab 在灯箱内循环，不逃到背后的页面 */
+  function trapLightboxTab(e) {
+    if (!lightbox || lightbox.hidden) return;
+    const items = lightboxFocusables(lightbox);
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const cur = doc.activeElement;
+    if (e.shiftKey && (cur === first || !lightbox.contains(cur))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (cur === last || !lightbox.contains(cur))) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   /* ============================================================
@@ -498,9 +532,19 @@
       if (e.target.closest && e.target.closest('.lightbox-close')) closeLightbox();
     });
     doc.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') { trapLightboxTab(e); return; }
       if (e.key === 'Escape') closeLightbox();
     });
     COSMOS.on('cosmos:escape', closeLightbox);
+    // Esc 复位：场景之外，把本章控件的参数也交回默认（boot.js 广播）
+    COSMOS.on('cosmos:reset', function () {
+      const m = mounted[currentIndex];
+      if (m && m.api && typeof m.api.reset === 'function') {
+        try { m.api.reset(); } catch (e) {
+          if (window.console && console.warn) console.warn('[COSMOS] widget reset 失败（已静默）', e);
+        }
+      }
+    });
 
     COSMOS.UI.meta = metas;
     COSMOS.UI.sections = sections;
@@ -515,6 +559,8 @@
     sections.forEach(function (section, i) {
       section.classList.toggle('is-active', i === index);
     });
+    const isFlowNow = !!(sections[index] && sections[index].classList.contains('is-flow'));
+    doc.documentElement.classList.toggle('flow-active', isFlowNow);
     navItems.forEach(function (b, i) {
       const on = i === index;
       b.classList.toggle('is-active', on);
