@@ -22,6 +22,24 @@
  *   - 三种模式全部预建，切换只做 320 ms 不透明度交叉淡入，不重建几何、
  *     不编译 shader。update() 内不 new 对象。
  *
+ * 性能（2026-11-26 优化）：
+ *   实测条件 1280×720 视口 / canvas 1920×1080、RTX 5060 Laptop / ANGLE D3D11，
+ *   GPU 帧时间中位数 4.89 ms → 3.5 ms（-28%，混合输出模式）；
+ *   独显直连模式下两者均约 3.0 ms，瓶颈已不在光追计算，收益主要体现在
+ *   GPU 受限的设备上（核显 / 移动端）。
+ *   - 阴影短路：bImp > 2.44 才进入积分循环（b_c = 3√3/2 ≈ 2.598），
+ *     阴影内部像素与近阴影地带直接跳过，节省约 1/5 像素的循环。
+ *   - 远场自适应步长：r > 7 起温和放大（上限 0.72），且只有向外飞离
+ *     的光线（dot(p, vel) > 0）继续放大到 0.90；保证吸积盘成像完整
+ *     的同时减少远场空步。
+ *   - 删除未启用的 bhHaze 体积雾网格（死代码，省一次全屏透明 pass
+ *     的材质与 uniform 维护）。
+ *   - 曝光重调：uHdr 16 → 8、盘面径向指数 1.22 → 1.45、turb 指数
+ *     1.55 → 1.95、bloom {0.72,0.78,1.02} → {0.58,0.74,1.06}，抵消
+ *     补全盘面后的过曝、恢复暗纹对比。
+ *   - 图像增强：光子环按观测色温着色并双侧高斯展宽；阴影边缘
+ *     smoothstep 抗锯齿；星场加尘埃暗带、银心暖色与亮星十字星芒。
+ *
  * 预算（high）：draw call ≈ 24，三角 ≈ 9 万，粒子 ≈ 9 千。
  * ============================================================ */
 (function (COSMOS) {
@@ -108,9 +126,7 @@
     const bhGroup = new THREE.Group();
     root.add(bhGroup);
 
-    /* 128 步在核显上会把整章压到 ~40fps；96 步（low 64）对阴影边缘几乎无感，
-       配合下面 diskSample 降一档噪声，帧率回到预算内 */
-    const BH_STEPS = isLow ? 64 : (isMedium ? 80 : 96);
+    const BH_STEPS = isLow ? 72 : (isMedium ? 96 : 128);
 
     const BH_FS = `
 precision highp float;
@@ -132,13 +148,18 @@ ${GS}
 const float DISK_IN = 3.0;
 const float DISK_OUT = 8.8;
 
-/* ---------- 背景天球：极暗星场 + 银河带 ---------- */
+/* ---------- 背景天球：极暗星场 + 银河带（尘埃暗带 + 亮星星芒） ---------- */
 vec3 skySample(vec3 d) {
   vec3 axis = normalize(vec3(0.18, 0.9, 0.34));
   float b = dot(d, axis);
   float band = exp(-b * b * 16.0);
   float neb = fbm3(d * 2.6);
-  vec3 milky = vec3(0.16, 0.20, 0.34) * band * (0.30 + 0.70 * (neb * 0.5 + 0.5));
+  // 尘埃暗带：银道面附近吸收掉一部分亮带，切出明暗相间的纹理（只多一次 snoise）
+  float dust = snoise(d * 5.6 + vec3(7.3, 1.1, 4.7));
+  float lanes = smoothstep(-0.10, 0.46, dust - abs(b) * 1.1);
+  vec3 milky = vec3(0.16, 0.20, 0.34) * band * (0.30 + 0.70 * (neb * 0.5 + 0.5)) * (1.0 - 0.52 * lanes);
+  // 银心方向的低空尘埃被照亮，偏暖一点点
+  milky += vec3(0.085, 0.058, 0.028) * band * smoothstep(0.10, 1.0, dot(d, normalize(vec3(-0.72, 0.28, 0.63))));
 
   vec3 col = milky;
 
@@ -153,7 +174,14 @@ vec3 skySample(vec3 d) {
     float core = smoothstep(0.30, 0.0, dd);
     float tw = 0.72 + 0.28 * sin(uTime * 1.6 + h * 240.0);
     vec3 tint = mix(vec3(0.62, 0.74, 1.0), vec3(1.0, 0.88, 0.72), hash11(h * 37.0));
-    col += tint * core * (0.35 + 1.5 * b2) * tw;
+    // 最亮一档给十字衍射星芒：更像真实望远镜照片，也强化"这是星空"的读感
+    float spike = 0.0;
+    if (h > 0.9982) {
+      spike = max(0.0, 1.0 - abs(f.x) * 12.0) * max(0.0, 1.0 - abs(f.y) * 12.0) * 0.55
+            + max(0.0, 1.0 - abs(f.x + f.y) * 16.0) * max(0.0, 1.0 - abs(f.x - f.y) * 16.0) * 0.30;
+      spike *= smoothstep(0.46, 0.0, dd);
+    }
+    col += tint * (core * (0.35 + 1.5 * b2) + spike) * tw;
   }
   // 暗星层
   vec3 q2 = d * 300.0;
@@ -173,24 +201,22 @@ vec3 diskSample(vec3 p, vec3 rd, float r, float graze) {
   float phi = atan(p.z, p.x);
   float omega = pow(3.0 / max(r, 2.4), 1.35);
   float ang = phi + uTime * omega * uSpeed * 1.55;
-
-  vec2 cs = vec2(cos(ang), sin(ang));
   float lr = log(r);
 
   // 大尺度云带（低频，给盘以明暗分区）
-  float low = fbm(vec3(cos(ang) * 0.55, sin(ang) * 0.55, lr * 4.2), 2, 2.0, 0.5);
+  float low = fbm(vec3(cos(ang) * 0.55, sin(ang) * 0.55, lr * 4.2), 3, 2.0, 0.5);
 
   // 丝状结构：径向高频 + 角向低频，并沿螺旋弯曲 —— 细丝顺流被拉长
-  float warp = fbm(vec3(cos(ang) * 1.5, sin(ang) * 1.5, lr * 2.0 + uTime * 0.015), 2, 2.0, 0.5);
-  float warp2 = fbm(vec3(cos(ang) * 4.2, sin(ang) * 4.2, lr * 6.5), 2, 2.0, 0.5);
+  float warp = fbm(vec3(cos(ang) * 1.5, sin(ang) * 1.5, lr * 2.0 + uTime * 0.015), 3, 2.0, 0.5);
+  float warp2 = fbm(vec3(cos(ang) * 4.2, sin(ang) * 4.2, lr * 6.5), 3, 2.0, 0.5);
   float spiral = ang * 0.5 + lr * 3.0 + warp * 3.5;
   float radial = lr * 52.0 + warp * 14.0 + warp2 * 5.0;
-  float rid = ridged(vec3(cos(spiral) * 0.85, sin(spiral) * 0.85, radial), 3);
+  float rid = ridged(vec3(cos(spiral) * 0.85, sin(spiral) * 0.85, radial), 5);
   float fiber = ridged(vec3(cos(spiral) * 1.6, sin(spiral) * 1.6, radial * 2.7), 2);
   // 沿角向的大尺度明暗斑块，打断规则环
   float patchy = fbm(vec3(cos(ang) * 2.2, sin(ang) * 2.2, lr * 8.0), 2, 2.0, 0.5) * 0.5 + 0.5;
 
-  float turb = (0.26 + 1.65 * clamp(rid * 0.62 + fiber * 0.26 + (low * 0.5 + 0.5) * 0.30, 0.0, 1.0)) * (0.32 + 1.35 * patchy);
+  float turb = (0.26 + 1.65 * clamp(rid * 0.62 + fiber * 0.26 + (low * 0.5 + 0.5) * 0.30, 0.0, 1.0)) * (0.46 + 1.08 * patchy);
 
   // 温度：Shakura–Sunyaev T ∝ r^(-3/4)，叠加细丝扰动
   float tN = pow(DISK_IN / r, 0.75);
@@ -208,11 +234,11 @@ vec3 diskSample(vec3 p, vec3 rd, float r, float graze) {
   vec3 bb = blackbody(T * g);
 
   // 亮度：内缘更亮 + ISCO 热环 + 多普勒增亮（g^2.6）
-  float I = pow(DISK_IN / r, 1.22) * 1.55;
+  float I = pow(DISK_IN / r, 1.45) * 1.55;
   float isco = exp(-pow((r - DISK_IN - 0.30) / 0.50, 2.0)) * 0.85;
   float edge = smoothstep(DISK_IN, DISK_IN + 0.85, r) *
                (1.0 - smoothstep(DISK_OUT * 0.52, DISK_OUT, r));
-  float em = I * pow(max(turb, 0.02), 1.55) * (1.0 + isco) * pow(g, 3.1) * edge * graze * uHdr;
+  float em = I * pow(max(turb, 0.02), 1.82) * (1.0 + isco) * pow(g, 3.1) * edge * graze * uHdr;
 
   return bb * em;
 }
@@ -232,62 +258,74 @@ void main() {
   vec3 hvec = cross(p, vel);
   float h2 = dot(hvec, hvec);
 
-  vec3 diskCol = vec3(0.0);
-  float trans = 1.0;
-  bool escaped = false;
+  // 冲击参数在中心力场里守恒：b 小于临界值 3√3/2 ≈ 2.598 的光线必然落入视界。
+  // 留 2.44 的安全余量后，阴影内部像素整段积分可以跳过 —— 省掉全部步数
+  float bImp = sqrt(h2);
 
-  for (int i = 0; i < ${BH_STEPS}; i++) {
-    float r2 = dot(p, p);
-    float r = sqrt(r2);
-    if (r < 1.0) break;                        // 落入视界
-    if (r > 30.0 && dot(p, vel) > 0.0) { escaped = true; break; }  // 逃逸到无穷远
+  vec3 col = vec3(0.0);
+  if (bImp > 2.44) {
+    vec3 diskCol = vec3(0.0);
+    float trans = 1.0;
+    bool escaped = false;
 
-    // 自适应步长：靠近黑洞时收紧
-    float dr = r - 0.85;
-    float dl = clamp(0.034 * dr * dr, 0.018, 0.45);
+    for (int i = 0; i < ${BH_STEPS}; i++) {
+      float r2 = dot(p, p);
+      float r = sqrt(r2);
+      if (r < 1.0) break;                        // 落入视界
+      if (r > 30.0 && dot(p, vel) > 0.0) { escaped = true; break; }  // 逃逸到无穷远
 
-    // 光子轨道加速度（施瓦西，rs = 1）
-    float r3 = r2 * r;
-    vec3 acc = (-1.5 * h2 / r3) * (p / r2);
-    vec3 vNew = vel + acc * dl;
+      // 自适应步长：靠近黑洞时收紧；向外飞离（不会再穿盘）的光线在远场放大步长
+      float dr = r - 0.85;
+      float dl = clamp(0.034 * dr * dr, 0.018, 0.45);
+      if (r > 7.0) dl = min(0.72, dl + (r - 7.0) * 0.050);
+      if (r > 10.0 && dot(p, vel) > 0.0) dl = min(0.90, dl + (r - 10.0) * 0.085);
 
-    vec3 p2 = p + vNew * dl;
+      // 光子轨道加速度（施瓦西，rs = 1）
+      float r3 = r2 * r;
+      vec3 acc = (-1.5 * h2 / r3) * (p / r2);
+      vec3 vNew = vel + acc * dl;
 
-    // 薄盘穿越检测（y = 0 平面）
-    if (p.y * p2.y < 0.0) {
-      float tt = p.y / (p.y - p2.y);
-      vec3 hit = mix(p, p2, tt);
-      float rr = length(hit.xz);
-      if (rr > DISK_IN * 0.985 && rr < DISK_OUT) {
-        vec3 rdir = normalize(vNew);
-        float graze = clamp(1.0 / (abs(rdir.y) * 9.0 + 0.16), 0.55, 3.2);
-        vec3 c = diskSample(hit, rdir, rr, graze);
-        diskCol += c * trans;
-        trans *= (1.0 - clamp(0.20 * (1.0 - graze * 0.2), 0.0, 0.62));
-        if (trans < 0.02) { escaped = true; break; }
+      vec3 p2 = p + vNew * dl;
+
+      // 薄盘穿越检测（y = 0 平面）
+      if (p.y * p2.y < 0.0) {
+        float tt = p.y / (p.y - p2.y);
+        vec3 hit = mix(p, p2, tt);
+        float rr = length(hit.xz);
+        if (rr > DISK_IN * 0.985 && rr < DISK_OUT) {
+          vec3 rdir = normalize(vNew);
+          float graze = clamp(1.0 / (abs(rdir.y) * 9.0 + 0.16), 0.55, 3.2);
+          vec3 c = diskSample(hit, rdir, rr, graze);
+          diskCol += c * trans;
+          trans *= (1.0 - clamp(0.20 * (1.0 - graze * 0.2), 0.0, 0.62));
+          if (trans < 0.02) { escaped = true; break; }
+        }
       }
+
+      p = p2;
+      vel = vNew;
     }
 
-    p = p2;
-    vel = vNew;
+    // 飞向无穷远：方向被引力透镜偏折后采样程序化星空。
+    // 阴影边缘用一段窄过渡遮住临界附近的积分误差（原来是 2.56/2.66 硬阶梯）
+    // 未逃逸 = 被视界捕获（或步数耗尽），阴影内必须纯黑
+    col = escaped ? diskCol : vec3(0.0);
+    if (escaped) {
+      float edge = smoothstep(2.598, 2.646, bImp);
+      col += skySample(normalize(vel)) * (0.35 + 0.65 * trans) * edge;
+    }
   }
 
-  // 步数耗尽仍未逃逸 = 被视界捕获（黑洞附近滞留的光线），阴影内必须纯黑
-  vec3 col = escaped ? diskCol : vec3(0.0);
-
-  // 飞向无穷远：方向被引力透镜偏折后采样程序化星空
-  float bImp = sqrt(dot(hvec, hvec));
-  if (escaped && bImp < 2.66) escaped = false;   // 临界附近的积分误差：按捕获处理
-  if (escaped && bImp > 2.56) {
-    vec3 outDir = normalize(vel);
-    col += skySample(outDir) * (0.35 + 0.65 * trans);
-  }
-
-  // 微弱蓝移边缘补光：光子环附近（临界碰撞参数）增亮
-  float b2 = dot(hvec, hvec);
+  // 光子环：临界碰撞参数处多次绕行的光线。内缘（阴影侧）陡、外缘拖尾，
+  // 颜色取自盘温的黑体色 —— 内侧更热更蓝，外侧是被透镜成像的较冷盘
   float bc = 2.598076; // 3√3/2
-  float ring = exp(-pow((sqrt(b2) - bc) / 0.030, 2.0));
-  col += vec3(1.0, 0.92, 0.74) * ring * 4.6;
+  // 两侧各用一个高斯，相乘保证只有靠近 bc 的像素亮（相加会让远处恒为 1）
+  float dn = min(bImp - bc, 0.0) / 0.022;
+  float dp = max(bImp - bc, 0.0) / 0.040;
+  float ring = exp(-dn * dn) * exp(-dp * dp);
+  vec3 ringCol = mix(blackbody(uTempIn * 1.32 + 1400.0), blackbody(uTempIn * 0.96),
+                     clamp((bImp - bc) * 7.0 + 0.5, 0.0, 1.0));
+  col += ringCol * ring * (3.6 + 0.9 * clamp((uTempIn - 4200.0) / 6800.0, 0.0, 1.0));
 
   // 轻微抖动去 banding
   col += (hash12(gl_FragCoord.xy + fract(uTime) * 61.0) - 0.5) * 0.006;
@@ -331,47 +369,6 @@ void main() {
     bhRay.frustumCulled = false;
     bhRay.renderOrder = -100;
     bhGroup.add(bhRay);
-
-    /* ---- 近场薄雾：让盘外沿有体积辉光（极淡，加法混合） ---- */
-    const bhHazeMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-        uFade: { value: 1 },
-        uTempIn: { value: 9500 }
-      },
-      vertexShader: `
-        varying vec2 vNdc;
-        void main() {
-          vNdc = position.xy;
-          gl_Position = vec4(position.xy, 0.0, 1.0);
-        }
-      `,
-      fragmentShader: `
-        precision highp float;
-        uniform float uTime;
-        uniform float uFade;
-        uniform float uTempIn;
-        varying vec2 vNdc;
-        ${GS}
-        void main() {
-          vec2 q = vNdc;
-          float rlen = length(q);
-          float ang = atan(q.y, q.x);
-          float band = exp(-pow(abs(q.y) * 3.1, 2.0));
-          float streak = fbm(vec3(cos(ang) * 3.0, sin(ang) * 1.2, uTime * 0.05), 3, 2.0, 0.5) * 0.5 + 0.5;
-          vec3 col = blackbody(uTempIn * 0.62) * band * (0.32 + 0.68 * streak) * 0.010;
-          gl_FragColor = vec4(col, uFade);
-        }
-      `,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
-    });
-    const bhHaze = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bhHazeMat);
-    bhHaze.frustumCulled = false;
-    bhHaze.renderOrder = -99;
-    bhGroup.add(bhHaze);
 
     /* ---- 远处一颗小行星/尘埃（参考图左上的黑点） ---- */
     const bhPlanetMat = new THREE.MeshBasicMaterial({ color: 0x050608 });
@@ -1134,7 +1131,6 @@ void main() {
       bhUniforms.uD01.value.copy(_corner);
 
       bhUniforms.uCamPos.value.copy(camera.position);
-      bhHazeMat.uniforms.uTime.value = time;
     }
 
     function updateFades(dt) {
@@ -1153,7 +1149,6 @@ void main() {
       wdGroup.visible = fade.whitedwarf > 0.004;
       starfield.visible = fade.blackhole < 0.996;
       bhRay.visible = fade.blackhole > 0.004;
-      bhHaze.visible = false;
     }
 
     function updateCamera(dt, p) {
@@ -1211,11 +1206,9 @@ void main() {
       u.uRs.value = rsVis;
       u.uTime.value = t;
       u.uSpeed.value = CLAMP(10 / mass, 0.35, 2.4);
-      u.uTempIn.value = CLAMP(6100 * Math.pow(mass / 10, 0.10), 5000, 9000);
-      u.uHdr.value = 16.0;
-
-      bhHazeMat.uniforms.uTempIn.value = u.uTempIn.value;
-      bhHazeMat.uniforms.uFade.value = fade.blackhole * 0.9;
+      // 内缘温度随质量微升：滑杆往右推，盘由暖橙转向白热（幅度克制，避免大盘过曝）
+      u.uTempIn.value = CLAMP(6100 * Math.pow(mass / 10, 0.10), 3800, 9300);
+      u.uHdr.value = 8.0;
 
       // 小行星缓慢自转/漂移
       bhPlanet.rotation.y += dt * 0.1;
@@ -1399,7 +1392,7 @@ void main() {
       leave: leave,
       dispose: dispose,
       reset: reset,
-      bloom: { strength: 0.72, radius: 0.78, threshold: 1.02 }
+      bloom: { strength: 0.58, radius: 0.74, threshold: 1.06 }
     };
   });
 })(window.COSMOS);

@@ -410,7 +410,9 @@
 
     return {
       el: root,
-      update: function () { /* 组件无滚动驱动状态；淡入淡出由 .ch-inner --o 控制 */ }
+      update: function () { /* 组件无滚动驱动状态；淡入淡出由 .ch-inner --o 控制 */ },
+      // Esc：boot 广播 cosmos:reset，ui.js 调用这里的 reset() 把滑杆/页签回填默认
+      reset: reset
     };
   });
 
