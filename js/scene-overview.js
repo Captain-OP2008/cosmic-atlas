@@ -35,6 +35,11 @@
   const CORE_RZ = 13.5;
   const WEB_RADIUS = 104.0;
 
+  /* 打开 01 章时纤维已经「卷」了多久（秒）。
+   * 纤维的差速旋转（核心快、外缘慢）会把放射状的丝束逐渐剪切成漩涡；
+   * 预置一段运行时间，让章节一打开就是漩涡形态，而不是从零慢慢卷起来。 */
+  const SPIN_WARMUP = 45;
+
   /* 金色流的颜色带：白热核心 → 金 → 奶油 → 淡蓝尾迹 */
   const C_HOT = [1.00, 0.86, 0.56];
   const C_GOLD = [1.00, 0.72, 0.30];
@@ -742,6 +747,10 @@
       else hideTips(null);
     }
 
+    // 本场景被激活的累计时间：只随本章 update 增长，与页面全局时间解耦，
+    // 使 01 章打开即处于「已卷起」的漩涡形态；之后随停留继续缓慢加深。
+    let runTime = 0;
+
     function update(t, dt, p) {
       if (!isFinite(t)) t = 0;
       if (!isFinite(dt) || dt <= 0) dt = 1 / 60;
@@ -804,11 +813,14 @@
       camera.updateMatrixWorld(true);
       camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
-      goldPts.material.uniforms.uTime.value = t;
-      galPts.material.uniforms.uTime.value = t;
-      webPts.material.uniforms.uTime.value = t;
-      bgStars.material.uniforms.uTime.value = t;
-      if (silkMesh) silkMesh.material.uniforms.uTime.value = t;
+      // 章内时间 + 预热：一打开就在「运行一段时间之后」的漩涡状态
+      runTime += dt;
+      const uT = runTime + SPIN_WARMUP;
+      goldPts.material.uniforms.uTime.value = uT;
+      galPts.material.uniforms.uTime.value = uT;
+      webPts.material.uniforms.uTime.value = uT;
+      bgStars.material.uniforms.uTime.value = uT;
+      if (silkMesh) silkMesh.material.uniforms.uTime.value = uT;
 
       // 核心光晕：轻微心跳，保持克制
       const pulse = 1 + Math.sin(t * 0.55) * 0.018 + (rm ? 0 : Math.sin(t * 1.7) * 0.006);

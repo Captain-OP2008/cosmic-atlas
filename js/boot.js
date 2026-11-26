@@ -22,6 +22,10 @@
                    (isTouch && isSmallScreen);
   const reduceMotion = mq('(prefers-reduced-motion: reduce)');
 
+  /* 02 章时间范围与日期输入保持同一口径：1800—2100 UTC */
+  const SOLAR_MS_MIN = Date.UTC(1800, 0, 1);
+  const SOLAR_MS_MAX = Date.UTC(2100, 11, 31, 23, 59, 0);
+
   /* 触屏设备：关掉自定义光标、加大点击热区 */
   if (isTouch || isMobile || isSmallScreen) document.body.classList.add('is-touch');
   if (isMobile) document.body.classList.add('is-mobile');
@@ -159,10 +163,242 @@
   }
 
   /* ============================================================
+   * 02 太阳系：共享状态默认值 + URL 深链 + 分享
+   * 状态结构见 artifacts/p1-contract.md §2；scene 是唯一时间推进者。
+   * ============================================================ */
+  function initSolarState() {
+    const S = COSMOS.state;
+    if (!S) return;
+    const now = Date.now();
+    if (!S.solar) {
+      S.solar = {
+        timeMs: now,
+        daysPerSec: 1,
+        paused: false,
+        view: 'whole',
+        focus: null,
+        selected: null,
+        labels: true,
+        orbits: true,
+        enlarge: false,
+        qualityHint: 'auto'
+      };
+    }
+    applySolarDeepLink(S.solar);
+  }
+
+  /* ?date=2024-04-08T18:18Z | ?rate=1 | ?paused=1 | ?view=inner|planet|whole
+   * ?body=earth | ?enlarge=1 | ?orbits=0 | ?labels=0 | ?reverse=1
+   * date 支持裸日期（按 UTC 00:00 解释）与带时区的 ISO 串。
+   */
+  function applySolarDeepLink(st) {
+    let q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    if (!q || !q.has) return;
+
+    if (q.has('date')) {
+      const raw = q.get('date') || '';
+      let ms = NaN;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) ms = Date.parse(raw + 'T00:00:00Z');
+      else ms = Date.parse(raw);
+      if (isFinite(ms)) st.timeMs = clamp(ms, SOLAR_MS_MIN, SOLAR_MS_MAX);
+    }
+    if (q.has('rate')) {
+      const r = parseFloat(q.get('rate'));
+      if (isFinite(r) && r !== 0) st.daysPerSec = clamp(Math.abs(r), 0.000011574, 365 * 3);
+    }
+    if (q.get('paused') === '1') st.paused = true;
+    if (q.get('reverse') === '1') st.daysPerSec = -Math.abs(st.daysPerSec);
+    const view = q.get('view');
+    if (view === 'whole' || view === 'inner' || view === 'planet' || view === 'free') st.view = view;
+    const body = q.get('body') || q.get('focus');
+    if (body && COSMOS.DATA && COSMOS.DATA.bodyById && COSMOS.DATA.bodyById(body)) {
+      st.focus = body;
+      st.selected = body;
+    }
+    if (q.get('enlarge') === '1') st.enlarge = true;
+    if (q.get('orbits') === '0') st.orbits = false;
+    if (q.get('labels') === '0') st.labels = false;
+  }
+
+  function solarShareUrl() {
+    const st = (COSMOS.state && COSMOS.state.solar) || {};
+    const parts = [];
+    const d = new Date(isFinite(st.timeMs) ? st.timeMs : Date.now());
+    parts.push('date=' + encodeURIComponent(d.toISOString().replace(/\.\d{3}Z$/, 'Z')));
+    if (st.daysPerSec && st.daysPerSec !== 1) parts.push('rate=' + encodeURIComponent(st.daysPerSec));
+    if (st.paused) parts.push('paused=1');
+    if (st.view && st.view !== 'whole') parts.push('view=' + encodeURIComponent(st.view));
+    if (st.focus) parts.push('body=' + encodeURIComponent(st.focus));
+    if (st.enlarge) parts.push('enlarge=1');
+    if (st.orbits === false) parts.push('orbits=0');
+    if (st.labels === false) parts.push('labels=0');
+    const base = location.href.split('#')[0].split('?')[0];
+    const hash = (location.hash && /^#ch-/.test(location.hash)) ? location.hash : '#ch-solar';
+    return base + '?' + parts.join('&') + hash;
+  }
+
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      let done = false;
+      function finish(ok) { if (!done) { done = true; resolve(ok); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { finish(true); }, function () { finish(false); });
+          return;
+        }
+      } catch (e) { /* 降级 */ }
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', 'readonly');
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand && document.execCommand('copy');
+        document.body.removeChild(ta);
+        finish(!!ok);
+      } catch (e2) { finish(false); }
+    });
+  }
+
+  function shareSolar() {
+    const url = solarShareUrl();
+    return copyText(url).then(function (ok) {
+      COSMOS.emit('solar:share', { ok: ok, url: url });
+      return ok;
+    });
+  }
+
+  /* base64url 编解码（06 章分享链接复用） */
+  function b64urlDecode(str) {
+    try {
+      let s = String(str || '').replace(/-/g, '+').replace(/_/g, '/');
+      while (s.length % 4) s += '=';
+      return decodeURIComponent(escape(atob(s)));
+    } catch (e) { return null; }
+  }
+
+  function b64urlEncode(str) {
+    try {
+      return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) { return ''; }
+  }
+
+  /* ============================================================
+   * 06 星系碰撞（collision）：默认值、深链、分享
+   * ============================================================ */
+  const COLLISION_SCENES = ['collide', 'custom', 'passer', 'retrograde', 'bullseye', 'spiral'];
+
+  function initCollisionState() {
+    const S = COSMOS.state;
+    const M = COSMOS.galaxyModel;
+    if (!S || !M) return;
+    if (!S.collision) {
+      S.collision = {
+        scene: 'collide',
+        paused: false,
+        speed: 1,
+        myr: 0,
+        params: { ratio: 1, approach: 9, spinA: 1, spinB: 1, leanA: 0, leanB: 0 },
+        show: { trails: true, velocity: false, names: true },
+        cam: { yaw: 0.6, pitch: 0.9, dist: 120 },
+        stats: { count: 0, coreDist: 0, energyPct: 0 },
+        ver: 0
+      };
+    }
+    applyCollisionDeepLink(S.collision);
+  }
+
+  /* ?cscene=collide | ?c=<base64url JSON {scene,params,speed,myr,show,cam}> */
+  function applyCollisionDeepLink(st) {
+    let q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    if (!q || !q.has) return;
+
+    const raw = q.get('c');
+    if (raw) {
+      let payload = null;
+      const json = b64urlDecode(raw);
+      if (json) { try { payload = JSON.parse(json); } catch (e) { payload = null; } }
+      if (payload && typeof payload === 'object') {
+        if (payload.scene && COLLISION_SCENES.indexOf(payload.scene) >= 0) st.scene = payload.scene;
+        if (payload.params && typeof payload.params === 'object') {
+          const P = payload.params;
+          const ratio = parseFloat(P.ratio); if (ratio === 1 || ratio === 0.5 || ratio === 0.25) st.params.ratio = ratio;
+          const ap = parseFloat(P.approach); if (ap === 6 || ap === 12 || ap === 20) st.params.approach = ap;
+          ['spinA', 'spinB'].forEach(function (k) { if (P[k] === 1 || P[k] === -1) st.params[k] = P[k]; });
+          ['leanA', 'leanB'].forEach(function (k) { const v = parseFloat(P[k]); if (v === 0 || v === 30 || v === 60) st.params[k] = v; });
+        }
+        if (payload.show) {
+          ['trails', 'velocity', 'names'].forEach(function (k) {
+            if (typeof payload.show[k] === 'boolean') st.show[k] = payload.show[k];
+          });
+        }
+        if (payload.cam) {
+          st.cam.yaw = (parseFloat(payload.cam.yaw) || 0) % (Math.PI * 2);
+          st.cam.pitch = clamp(parseFloat(payload.cam.pitch) || 0.9, 0.05, 1.52);
+          st.cam.dist = clamp(parseFloat(payload.cam.dist) || 120, 12, 900);
+        }
+        const speed = parseFloat(payload.speed);
+        if (isFinite(speed) && speed !== 0) st.speed = clamp(speed, -4, 4) || 1;
+        const myr = parseFloat(payload.myr);
+        if (isFinite(myr) && myr >= 0) st.myr = Math.min(4000, myr);
+        st.paused = payload.paused !== false;
+      }
+    }
+
+    const sceneId = q.get('cscene');
+    if (sceneId && COLLISION_SCENES.indexOf(sceneId) >= 0) st.scene = sceneId;
+    if (q.get('paused') === '1') st.paused = true;
+  }
+
+  function collisionShareUrl() {
+    const M = COSMOS.galaxyModel;
+    const st = (COSMOS.state && COSMOS.state.collision) || {};
+    const payload = {
+      v: 1,
+      scene: st.scene || 'collide',
+      params: st.params || {},
+      paused: true,
+      speed: +(st.speed || 1),
+      myr: +(st.myr || 0).toFixed(2),
+      show: {
+        trails: !!(st.show && st.show.trails),
+        velocity: !!(st.show && st.show.velocity),
+        names: !!(st.show && st.show.names)
+      },
+      cam: {
+        yaw: +((st.cam && st.cam.yaw) || 0).toFixed(3),
+        pitch: +((st.cam && st.cam.pitch) || 0.9).toFixed(3),
+        dist: +((st.cam && st.cam.dist) || 120).toFixed(2)
+      }
+    };
+    let encoded = '';
+    try {
+      encoded = (M && M.b64urlEncode) ? M.b64urlEncode(JSON.stringify(payload)) : b64urlEncode(JSON.stringify(payload));
+    } catch (e) { encoded = ''; }
+    const base = location.href.split('#')[0].split('?')[0];
+    return base + '?c=' + encoded + '#ch-collision';
+  }
+
+  function shareCollision() {
+    const url = collisionShareUrl();
+    return copyText(url).then(function (ok) {
+      COSMOS.emit('collision:share', { ok: ok, url: url });
+      return ok;
+    });
+  }
+
+  /* ============================================================
    * 初始化
    * ============================================================ */
   async function boot() {
     document.documentElement.classList.add('is-loading');
+
+    // 0) 02 / 06 章共享状态（默认值 + URL 深链），必须早于控件挂载
+    try { initSolarState(); } catch (e) { reportError('solar-init', e); }
+    try { initCollisionState(); } catch (e) { reportError('collision-init', e); }
 
     // 1) 界面 + 内容
     setLoader(0.04, T('正在排版图文…', 'Laying out the text…'));
@@ -201,7 +437,7 @@
         depth: true,
         stencil: false,
         powerPreference: 'high-performance',
-        preserveDrawingBuffer: false
+        preserveDrawingBuffer: true
       });
     } catch (e) {
       reportError('WebGLRenderer', e);
@@ -327,16 +563,17 @@
   function applySize() {
     vw = window.innerWidth;
     vh = window.innerHeight;
-    // 低 DPI 屏幕做 1.3× 超采样再交给浏览器缩小，显著提升线条与文字锐度
+    // 低 DPI 屏幕做 1.5× 超采样再交给浏览器缩小，显著提升线条与文字锐度
     const baseDPR = window.devicePixelRatio || 1;
-    const ss = isMobile ? 1 : (baseDPR <= 1.1 ? 1.3 : 1);
+    const ss = isMobile ? 1 : (baseDPR <= 1.1 ? 1.5 : 1);
     dpr = Math.min(baseDPR * ss, dprCeil);
 
-    // 超大视口兜底：高 DPI 大窗口下画布物理像素会到 300 万以上，部分 GPU / 合成路径
-    // 会漏掉一块合成区域，表现为画面中央一块纯黑矩形（用户实测：窗口缩小就消失）。
-    // 这里给物理像素设上限，超出时按比例压低渲染像素比（不低于 1:1），与缩小窗口后的负载拉齐。
-    const MAX_CANVAS_PIXELS = 2500000;
-    if (vw * vh * baseDPR * baseDPR > MAX_CANVAS_PIXELS) {
+    // 超大视口兜底：高 DPI 大窗口 / 低 DPI 超采样叠加后画布物理像素会到 300 万以上，
+    // 部分 GPU / 合成路径会漏掉一块合成区域，表现为画面中央一块纯黑矩形（用户实测：窗口缩小就消失）。
+    // 这里按「最终输出像素」而不是 baseDPR 判断（低 DPI 超采样也要算进去），
+    // 超出时按比例压低渲染像素比（不低于 1:1；视口本身已超上限时只能维持 1:1）。
+    const MAX_CANVAS_PIXELS = 3500000;
+    if (vw * vh * dpr * dpr > MAX_CANVAS_PIXELS) {
       dpr = Math.max(1, Math.min(dpr, Math.sqrt(MAX_CANVAS_PIXELS / (vw * vh))));
     }
 
@@ -928,6 +1165,11 @@
   }
 
   function bindEvents() {
+    /* 控件请求生成分享链接（06 章星系碰撞） */
+    COSMOS.on('collision:shareReq', function () {
+      shareCollision();
+    });
+
     window.addEventListener('scroll', function () {
       // 实际计算在 rAF 内，这里只保证滚动一发生就更新 UI 状态
     }, { passive: true });
@@ -993,8 +1235,17 @@
 
       const isBtn = tag === 'BUTTON';
       const isArrow = k === 'ArrowRight' || k === 'ArrowDown' || k === 'ArrowLeft' || k === 'ArrowUp';
+      const stage = stages[activeIndex];
       // 场景声明消费方向键时，方向键归场景（键盘等价操纵，§3.3）；切章用 PageUp/PageDown/j/k/Home/End
-      if (isArrow && !isBtn && stages[activeIndex] && stages[activeIndex].arrowKeys === true) return;
+      if (isArrow && !isBtn && stage && stage.arrowKeys === true) return;
+      // 场景声明消费空格时（06 章播放/暂停），空格不再切章
+      if (k === ' ' && !isBtn && stage && stage.handlesSpace === true) {
+        e.preventDefault();
+        if (sections[activeIndex] && sections[activeIndex].id === 'ch-collision') {
+          COSMOS.emit('collision:cmd', { type: 'pause' });
+        }
+        return;
+      }
       if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || (!isBtn && (k === ' ' || k === 'j'))) {
         e.preventDefault();
         goTo(activeIndex + 1);
@@ -1048,6 +1299,10 @@
   /* 暴露给调试 */
   COSMOS.app = {
     goTo: goTo,
+    shareSolar: shareSolar,
+    solarShareUrl: solarShareUrl,
+    shareCollision: shareCollision,
+    collisionShareUrl: collisionShareUrl,
     get activeIndex() { return activeIndex; },
     get stages() { return stages; },
     get blend() { return blend; },

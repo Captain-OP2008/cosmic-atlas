@@ -9,7 +9,9 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23fff'/%3E%3Ccircle cx='25' cy='9' r='2' fill='%231C67E3'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/main.css" />
 <link rel="stylesheet" href="css/solar.css" />
+<link rel="stylesheet" href="css/solar-sky.css" />
 <link rel="stylesheet" href="css/deep.css" />
+<link rel="stylesheet" href="css/collision.css" />
 <link rel="stylesheet" href="css/cosmos.css" />
 <link rel="stylesheet" href="css/human.css" />
 </head>
@@ -64,7 +66,7 @@
     <span class="hud-sep"></span>
     <span class="hud-coord" id="hud-coord">RA 00h00m · DEC +00°00′</span>
     <span class="hud-sep"></span>
-    <span class="hud-chapter" id="hud-chapter">00 / 12</span>
+    <span class="hud-chapter" id="hud-chapter">00 / 11</span>
     <button class="lang-toggle" id="lang-toggle" type="button" aria-label="切换到英文版">EN</button>
   </div>
 </header>
@@ -102,21 +104,24 @@
   <section class="chapter ch-galaxies" data-stage="galaxies" data-num="05" data-name="星系动物园" data-en="GALAXY ZOO"
            data-part="IV · 宇宙深处" data-h="260" data-coord="RA 13h29m · DEC +47°11′" id="ch-galaxies"></section>
 
-  <section class="chapter ch-extreme" data-stage="extreme" data-num="06" data-name="极端宇宙" data-en="EXTREME COSMOS"
+  <section class="chapter ch-collision" data-stage="collision" data-num="06" data-name="星系碰撞" data-en="GALAXY COLLISION"
+           data-part="IV · 宇宙深处" data-h="300" data-coord="RA 12h01m · DEC −18°52′" id="ch-collision"></section>
+
+  <section class="chapter ch-extreme" data-stage="extreme" data-num="07" data-name="极端宇宙" data-en="EXTREME COSMOS"
            data-part="IV · 宇宙深处" data-h="280" data-coord="RA 12h57m · DEC +22°01′" id="ch-extreme"></section>
 
   <!-- V · 人类探索 -->
-  <section class="chapter ch-history" data-stage="explore1" data-num="07" data-name="航天里程碑" data-en="SPACE AGE"
+  <section class="chapter ch-history" data-stage="explore1" data-num="08" data-name="航天里程碑" data-en="SPACE AGE"
            data-part="V · 人类探索" data-h="300" data-coord="RA 00h00m · DEC +00°00′" id="ch-history"></section>
 
-  <section class="chapter ch-vehicles" data-stage="explore2" data-num="08" data-name="现役与未来载具" data-en="VEHICLES"
+  <section class="chapter ch-vehicles" data-stage="explore2" data-num="09" data-name="现役与未来载具" data-en="VEHICLES"
            data-part="V · 人类探索" data-h="260" data-coord="RA 06h45m · DEC −16°42′" id="ch-vehicles"></section>
 
-  <section class="chapter ch-future" data-stage="explore3" data-num="09" data-name="未来计划" data-en="WHAT'S NEXT"
+  <section class="chapter ch-future" data-stage="explore3" data-num="10" data-name="未来计划" data-en="WHAT'S NEXT"
            data-part="V · 人类探索" data-h="240" data-coord="RA 22h57m · DEC −29°37′" id="ch-future"></section>
 
   <!-- 终章 -->
-  <section class="chapter ch-finale" data-stage="paleblue" data-num="10" data-name="暗淡蓝点" data-en="PALE BLUE DOT"
+  <section class="chapter ch-finale" data-stage="paleblue" data-num="11" data-name="暗淡蓝点" data-en="PALE BLUE DOT"
            data-part="终章" data-h="100" data-coord="RA 16h04m · DEC +45°52′" id="ch-finale"></section>
 
 </main>
@@ -137,15 +142,19 @@
 <script src="js/lib-core.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/tex-solar.js"></script>
+<script src="js/tex-moons.js"></script>
 
 <!-- 数据与文案 -->
 <script src="js/data.js"></script>
+<script src="js/ephem.js"></script>
+<script src="js/galaxy-model.js"></script>
 <script src="js/data-en.js"></script>
 <script src="js/content-core.js"></script>
 <script src="js/content-solar.js"></script>
 <script src="js/content-deep.js"></script>
 <script src="js/content-cosmos.js"></script>
 <script src="js/content-human.js"></script>
+<script src="js/content-collision.js"></script>
 <script src="js/content-en.js"></script>
 
 <!-- 场景模块 -->
@@ -158,13 +167,17 @@
 <script src="js/scene-compact.js"></script>
 <script src="js/scene-galaxies.js"></script>
 <script src="js/scene-extreme.js"></script>
+<script src="js/scene-collision.js"></script>
 <script src="js/scene-explore.js"></script>
 <script src="js/scene-finale-earth.js"></script>
 
 <!-- 章节组件（DOM 控件） -->
 <script src="js/feat-solar.js"></script>
+<script src="js/feat-events.js"></script>
+<script src="js/feat-sky.js"></script>
 <script src="js/feat-compare.js"></script>
 <script src="js/feat-deep.js"></script>
+<script src="js/feat-collision.js"></script>
 <script src="js/feat-cosmos.js"></script>
 <script src="js/feat-human.js"></script>
 

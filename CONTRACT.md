@@ -136,7 +136,7 @@ COSMOS.builders.starfieldGeometry / starfieldMaterial
 
 ## 5. 章节清单（整站结构）
 
-> **注**：下表是 v1（8 章）结构，已过时。当前为 13 章（00–12），以 `AGENTS.md` §5.4 与 `README.md` 的章节表为准。
+> **注**：下表是 v1（8 章）结构，已过时。当前为 12 章（00–11），以 `AGENTS.md` §5.4 与 `README.md` 的章节表为准。
 
 | # | stage id | 章节 | 负责 |
 |---|----------|------|------|

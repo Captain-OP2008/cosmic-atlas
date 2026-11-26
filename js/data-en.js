@@ -198,6 +198,86 @@
   for (var p = 0; p < D.planets.length; p++) mixPlanet(D.planets[p], PLANETS[D.planets[p].id]);
   for (var dp = 0; dp < D.dwarfPlanets.length; dp++) mixPlanet(D.dwarfPlanets[dp], PLANETS[D.dwarfPlanets[dp].id]);
 
+  /* ---------------- Moons (12, Solar System chapter) ----------------
+   * Keyed by moon id; parent/texture/numbers stay in data.js.
+   */
+  var MOONS = {
+    moon: {
+      name: 'Moon',
+      tagline: 'Earth\'s only natural satellite, and the only other world we have walked on',
+      desc: 'Tidally locked, it always shows Earth the same face. Between 1969 and 1972, twelve astronauts walked on it and brought back 382 kg of samples.',
+      special: 'It has slowed Earth\'s spin to 24 hours: in the Devonian period, 400 million years ago, a day lasted about 22 hours.'
+    },
+    phobos: {
+      name: 'Phobos',
+      tagline: 'A rubble pile that circles Mars three times a day',
+      desc: 'Irregular in shape and covered with craters and grooves, it may be a captured asteroid or debris from a giant impact.',
+      special: 'Its orbit drops about 1.8 cm per month. In roughly 50 million years it will crash into Mars or break up into a ring.'
+    },
+    deimos: {
+      name: 'Deimos',
+      tagline: 'Mars\' quiet little companion',
+      desc: 'Much smaller than Phobos and blanketed in dust, its crater rims have been worn smooth.',
+      special: 'From the Martian surface it looks like a slow-moving bright star rather than an obvious moon.'
+    },
+    io: {
+      name: 'Io',
+      tagline: 'The most volcanically active body in the Solar System',
+      desc: 'More than 400 active volcanoes stain its surface yellow, orange, and red with sulfur compounds, while Jupiter\'s tides knead its interior.',
+      special: 'Its plumes rise 300 km high; the material is ionized by Jupiter\'s magnetic field and forms a plasma torus.'
+    },
+    europa: {
+      name: 'Europa',
+      tagline: 'An ice shell that may hide more liquid water than Earth',
+      desc: 'Its surface is smooth ice crisscrossed by reddish-brown cracks. About 100 km below may lie a global ocean.',
+      special: 'Europa Clipper launched in 2024 and is due to enter Jupiter orbit around 2030 to assess whether that ocean is habitable.'
+    },
+    ganymede: {
+      name: 'Ganymede',
+      tagline: 'The largest moon in the Solar System, bigger than Mercury',
+      desc: 'The only moon with its own magnetic field, its surface mixes ancient dark terrain with younger bright grooved regions.',
+      special: 'Hubble found a thin oxygen atmosphere in the 1990s, produced when radiation splits water ice at the surface.'
+    },
+    callisto: {
+      name: 'Callisto',
+      tagline: 'One of the most heavily cratered surfaces known',
+      desc: 'Almost no geological activity for 4 billion years has left its surface as a complete record of impacts.',
+      special: 'It orbits outside Jupiter\'s harshest radiation belts, making it a candidate site for a future crewed outpost.'
+    },
+    enceladus: {
+      name: 'Enceladus',
+      tagline: 'An ocean world spraying ice from its south pole',
+      desc: 'Fissures at the south pole vent salty ice grains that form one of Saturn\'s faint rings; the plumes contain organic molecules.',
+      special: 'Cassini flew through the plumes and detected salts and silica grains, hinting at hydrothermal activity below.'
+    },
+    rhea: {
+      name: 'Rhea',
+      tagline: 'A cratered world made of ice',
+      desc: 'With a density of only 1.24 g/cm³ it is mostly water ice: bright, but covered in ancient craters.',
+      special: 'During a 2008 flyby Cassini detected a thin oxygen atmosphere, created as magnetospheric particles erode the ice.'
+    },
+    titan: {
+      name: 'Titan',
+      tagline: 'The only moon with a thick atmosphere and surface lakes',
+      desc: 'Its atmosphere is about 45% denser than Earth\'s and mostly nitrogen. Methane drives rain, rivers, and lakes: a second weather system.',
+      special: 'Huygens landed in 2005 and photographed the surface, the first landing on a world in the outer Solar System.'
+    },
+    triton: {
+      name: 'Triton',
+      tagline: 'A cryovolcanic moon on a backward orbit',
+      desc: 'The only large moon orbiting opposite to its planet\'s spin, it is almost certainly a captured Kuiper Belt object.',
+      special: 'Voyager 2 photographed dark nitrogen-ice plumes in 1989, showing that it is still volcanically active.'
+    },
+    charon: {
+      name: 'Charon',
+      tagline: 'Pluto\'s tidally locked partner',
+      desc: 'With 12% of Pluto\'s mass, it orbits a common center of gravity with Pluto, so the pair is often treated as a double dwarf planet.',
+      special: 'New Horizons found reddish material at its north pole in 2015, delivered by methane escaping from Pluto.'
+    }
+  };
+
+  for (var m = 0; m < D.moons.length; m++) mixPlanet(D.moons[m], MOONS[D.moons[m].id]);
+
   /* ---------------- Solar System missions ---------------- */
 
   mixBy(D.missions, 'id', {
@@ -805,7 +885,8 @@
     { label: 'Solar System Scope planet textures (2048px)', license: 'CC BY 4.0' },
     { label: 'IAU planet definition and moon naming (2025)', license: 'CC BY 4.0' },
     { label: 'LIGO / Virgo gravitational-wave observations', license: 'CC BY 4.0' },
-    { label: 'Laniakea Supercluster (Tully et al. 2014, Nature)', license: 'Data citation' }
+    { label: 'Laniakea Supercluster (Tully et al. 2014, Nature)', license: 'Data citation' },
+    { label: 'Moon and Pluto global maps (10 bodies, 1024×512)', license: 'Public Domain / CC0 1.0 / attribution' }
   ];
 
   for (var s = 0; s < D.sources.length && s < SOURCES.length; s++) {

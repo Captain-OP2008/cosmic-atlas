@@ -57,6 +57,7 @@
     'ch-compare': { name: 'Planetary Comparison', part: 'II · The Solar System' },
     'ch-compact': { name: 'Compact Objects', part: 'III · Deep Space' },
     'ch-galaxies': { name: 'Galaxy Zoo', part: 'IV · The Deep Universe' },
+    'ch-collision': { name: 'Galaxy Collision', part: 'IV · The Deep Universe' },
     'ch-extreme': { name: 'Extreme Universe', part: 'IV · The Deep Universe' },
     'ch-history': { name: 'Space Age', part: 'V · Human Exploration' },
     'ch-vehicles': { name: 'Launch Vehicles', part: 'V · Human Exploration' },

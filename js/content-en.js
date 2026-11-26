@@ -2,8 +2,8 @@
  * COSMOS ATLAS · 英文文案覆盖（content-en.js）
  * ------------------------------------------------------------
  * 只在英文模式（?lang=en / localStorage）下生效；中文模式首行 return，零影响。
- * 本文件不新增章节，只覆盖 js/content-*.js 已注册的 11 章文案字段：
- *   title / titleEn / part / kicker / lead / paragraphs[] /
+ * 本文件不新增章节，只覆盖 js/content-*.js 已注册的 12 章文案字段：
+ *   title / titleEn / part / kicker / oneLiner / lead / paragraphs[] /
  *   facts[{v,u,l}] / hint / quote{text,cite} / cta{label}
  * 不覆盖：num / index / layout / widget / cta.goto / futurePlans 以外的扩展字段。
  *   —— title 是英文主标题；titleEn 保留中文副标题原样（双语并列）。
@@ -89,23 +89,24 @@
     title: 'The Solar System',
     titleEn: '太阳系',
     part: 'II · The Solar System',
-    kicker: 'A Solar System you can set in motion',
-    lead: "The Sun holds 99.86% of the Solar System's mass; the remaining 0.14% is shared by the eight planets and everything else.",
+    kicker: 'A Solar System you can set to any date',
+    oneLiner: 'Scrub the date; the planets return to where they really were.',
+    lead: 'Turn the date to any day and the planets return to their real positions — orbital theory, not animation.',
     paragraphs: [
-      "The Solar System's boundary is not a set of eight concentric circles. Eight planets follow their own elliptical orbits around the Sun, each orbit tilted slightly against the others; the Sun holds 99.86% of the system's mass and is the only gravitational driver.",
-      "By composition, the four inner planets (terrestrial planets) are mostly rock and metal; the four outer planets (giant planets) are mostly hydrogen, helium and ice. Jupiter's diameter is 139,820 km against Earth's 12,742 km; Neptune's semi-major axis is 30.07 AU, and one orbit takes 59,800 days.",
-      'The Sun is drawn 2.5× oversized and orbits are compressed by the square root of their AU: inner planets hug the Sun, outer planets spread outward in steps, and Neptune still runs slightly past the default view — zoom out to see it. Relative planet sizes keep their true diameter ratios, so Jupiter really is a size up from Earth and Mercury really is under half of it.',
-      'The Sun rotates too: its equator turns once every 25.4 days, and its surface sits near 5,500 °C. It is not burning; it fuses hydrogen into helium in the core and moves that energy outward, layer by layer.',
-      'Common misconception: planets orbit like clockwork gears, all in sync. In fact the closer a planet is, the shorter its year — Mercury circles the Sun in 88 days, while Neptune needs 59,800. Set the speed slider to 20 days per second and Mercury races while Neptune barely moves.',
-      "Scale check: spread the Solar System's 4.6 billion years across a timeline and all of recorded astronomy occupies only the last few seconds. Voyager 1 left in 1977 and has flown for more than forty years to reach about 165 AU of interstellar space — a distance light itself needs a day to cross."
+      'The Solar System is not eight concentric circles. When this chapter opens, the eight planets are placed by public Keplerian orbital theory for the current UTC instant; set the date to 2024-04-08 and Earth, the Moon and the Sun return to the moment of the total solar eclipse. The replayable range is 1800–2100.',
+      "Orbit lines use true eccentricity: Mercury's e is 0.206 and Pluto's 0.249, so they really do swing nearer and farther from the Sun. To fit Mercury and Neptune on one screen, radial distance is compressed as the square root of AU; body sizes use another scale, because the Sun is 109 Earth diameters across and would otherwise fill the frame.",
+      "Twelve moons are selectable: the Moon, Phobos and Deimos, Io through Callisto, Enceladus, Rhea and Titan, Triton, and Charon. Their positions also come from orbital elements, compressed into 4.5–8× the parent planet's radius. Click a console button or a label and the camera follows.",
+      'Events lists equinoxes, solstices, planetary oppositions, greatest elongations and eclipses over the next ten years. Eclipses are not canned animations: the code compares the actual geometry of Sun, Earth and Moon, tests whether the umbra reaches the surface or Earth\'s shadow covers the lunar disc, and sorts them into total, annular, partial and penumbral. Jump sets the clock to that day.',
+      "Tonight's sky flattens the same ephemeris onto a horizon chart: pick a city and a time to read altitude and azimuth for the Sun, Moon and planets, plus lunar phase and illuminated fraction. The numbers can be exported as JSON for cross-checking against planetarium software.",
+      'Common misconception: a Solar System model can show true sizes and true distances at the same time. Shrink the Sun to a basketball and Earth becomes a 1 mm grain 26 m away, with Neptune at 780 m — no screen holds both. Compression is the only way to keep the model both visible and honest. Scale check: step outside tonight; Jupiter may be hanging beside a bright star. Open the sky panel and find it.'
     ],
     facts: [
       { v: '8', u: 'planets', l: 'Plus 5 dwarf planets' },
       { v: '99.86', u: '%', l: "Sun's share of the Solar System's mass" },
       { v: '4.6', u: 'billion years', l: 'Age of the Solar System' },
-      { v: '30.07', u: 'AU', l: "Neptune's semi-major axis" }
+      { v: '1800–2100', u: 'CE', l: 'Replayable date range' }
     ],
-    hint: 'Drag to rotate · Ctrl + scroll / pinch to zoom · Click a planet for its file · Slider speeds up the orbits'
+    hint: "Drag to rotate · Scroll to zoom · Change the date or speed · Click a planet or moon for its file · Events and tonight's sky"
   });
 
   /* ============================================================
@@ -187,7 +188,7 @@
   });
 
   /* ============================================================
-   * 06 · 极端宇宙
+   * 07 · 极端宇宙
    * ============================================================ */
   set('extreme', {
     title: 'Extreme Universe',
@@ -213,7 +214,7 @@
   });
 
   /* ============================================================
-   * 07 · 航天里程碑
+   * 08 · 航天里程碑
    * ============================================================ */
   set('history', {
     title: 'Space Age',
@@ -247,7 +248,7 @@
   });
 
   /* ============================================================
-   * 08 · 现役与未来载具
+   * 09 · 现役与未来载具
    * ============================================================ */
   set('vehicles', {
     title: 'Launch Vehicles',
@@ -277,7 +278,7 @@
   });
 
   /* ============================================================
-   * 09 · 未来计划
+   * 10 · 未来计划
    * ============================================================ */
   set('future', {
     title: "What's Next",
@@ -329,7 +330,34 @@
   });
 
   /* ============================================================
-   * 10 · 终章
+   * 06 · 星系碰撞（GALAXY COLLISION）
+   * ============================================================ */
+  set('collision', {
+    title: 'Galaxy Collision',
+    titleEn: '星系碰撞',
+    part: 'IV · The Deep Universe',
+    kicker: 'TOOMRE 1972 · RESTRICTED N-BODY',
+    oneLiner: '12,000 stars compute their own tidal bridge and tail.',
+    lead: 'Two galaxies brush past each other, and their stars are pulled into bridges and tails.',
+    paragraphs: [
+      'Two galaxies: the main one holds 100 billion solar masses, with a disk radius of 11 kpc; the companion can be set to half or a quarter of that mass. The 12,000 stars on screen are tracers — they feel only the gravity of the two cores and never pull on one another, the restricted N-body method Toomre used in 1972. At the default rate, one real second equals 10 million years.',
+      'When the companion sweeps past, stars on the near side are slowed and stars on the far side are flung faster. The old circular orbits bend into long tidal bridges and tidal tails. These are not streams of debris: they are stars whose paths were rewritten, arranged into an arc. Stars sit light-years apart, so almost none actually collide. The Antennae Galaxies (NGC 4038/4039) are in this phase right now.',
+      'Same path, different spin. When the companion orbits prograde — spinning the same way as the main disk — the tidal pull adds up in the same direction on every pass, and the tail grows longer. When the orbit is retrograde, the pulls cancel and the disk stays nearly intact. The two scenes that differ only in spin direction make the comparison directly.',
+      'Send the companion almost straight through the disk — an impact parameter of just 0.5 kpc — and stars pick up radial motion; their elliptical orbits precess and, about 110 million years later, settle into a ring. Lynds and Toomre used this mechanism to explain ring galaxy formation in 1976: the ring is not new material, just the old disk rearranged. The Cartwheel Galaxy is one example.',
+      'Spiral arms are not a fixed crowd of stars. They are a density wave: stars keep orbiting, briefly bunching as they pass through, like traffic slowing at a work zone — the cars move, the jam moves too. Lin and Shu proposed this picture in 1964. In the Spiral Winds Up scene the galaxy stays put while the arms tighten within a few turns, so the wave needs steady driving to persist. The Whirlpool Galaxy (M51) is being stirred this way by its companion.',
+      'This simulation has no dark matter halos, and therefore no dynamical friction: the two cores can pass through each other and separate again, while real galaxies are dragged into mergers. Their gravity is softened inside 1.2 kpc to keep the close encounter stable. In 2025, Sawala and colleagues reported that the Milky Way and Andromeda are not certain to collide at all. Every second you drag here rewrites an orbit.'
+    ],
+    facts: [
+      { v: '100 billion', u: 'M☉', l: 'Mass of the main galaxy' },
+      { v: '11', u: 'kpc', l: 'Radius of the main galaxy disk' },
+      { v: '10', u: 'Myr', l: 'Simulated time per real second at default speed' },
+      { v: '110', u: 'Myr', l: 'Time to form a ring after a bullseye pass' }
+    ],
+    hint: 'Drag to rotate · Scroll to zoom · Space to pause'
+  });
+
+  /* ============================================================
+   * 11 · 终章
    * ============================================================ */
   set('finale', {
     title: 'Pale Blue Dot',

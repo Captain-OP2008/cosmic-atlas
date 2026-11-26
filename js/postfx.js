@@ -1,6 +1,7 @@
 /* ============================================================
  * COSMOS ATLAS — 后处理管线
  * 渲染到 HDR 缓冲 → 亮度提取 → 三级高斯模糊泛光 → ACES 色调映射
+ * → FXAA 抗锯齿 → 屏幕
  * 附带：暗角、胶片颗粒、轻微色差、暗部冷调
  * ============================================================ */
 (function (COSMOS) {
@@ -136,6 +137,70 @@
     }
   `;
 
+  /* FXAA 3.11 简化版（与 three.js 内置 FXAA 同一套系数，去掉 subpixel 项）：
+   * 4 角 luma 判边 → 由对角线亮度差求边缘方向 → 沿方向两档 5 tap 混合，
+   * 取对比度更低的一档输出。共 9 次采样，无循环、无数组。
+   * 输入必须是 COMPOSITE 输出的 linearToSRGB 显示值（不是线性 HDR）。 */
+  const FXAA_FS = `
+    uniform sampler2D tDiffuse;
+    uniform vec2 uTexel;
+    uniform vec2 uResolution;
+    varying vec2 vUv;
+
+    #define FXAA_REDUCE_MIN (1.0 / 128.0)
+    #define FXAA_REDUCE_MUL (1.0 / 8.0)
+    #define FXAA_SPAN_MAX   8.0
+    #define EDGE_THRESHOLD_MIN   0.0312
+    #define EDGE_THRESHOLD_SCALE 0.125
+
+    float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
+    float lumaAt(vec2 uv) { return luma(texture2D(tDiffuse, uv).rgb); }
+
+    void main() {
+      // RT 还没 setSize（1×1）时直通，避免无意义采样
+      if (uResolution.x < 2.0 || uResolution.y < 2.0) {
+        gl_FragColor = vec4(texture2D(tDiffuse, vUv).rgb, 1.0);
+        return;
+      }
+
+      vec2 texel = uTexel;
+      vec3 center = texture2D(tDiffuse, vUv).rgb;
+      float lumaM  = luma(center);
+      float lumaNW = lumaAt(vUv + vec2(-1.0, -1.0) * texel);
+      float lumaNE = lumaAt(vUv + vec2( 1.0, -1.0) * texel);
+      float lumaSW = lumaAt(vUv + vec2(-1.0,  1.0) * texel);
+      float lumaSE = lumaAt(vUv + vec2( 1.0,  1.0) * texel);
+
+      float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+      float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+      // 低对比区域原样输出：太空背景里的单像素星点不该被当成边缘糊掉
+      float edgeThreshold = max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD_SCALE);
+      if (lumaMax - lumaMin < edgeThreshold) {
+        gl_FragColor = vec4(center, 1.0);
+        return;
+      }
+
+      // 边缘方向 = 对角线亮度差的反向梯度
+      vec2 dir;
+      dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+      dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+
+      // 步长：方向归一化后截断到 1~8 texel，并带下限防止方向退化
+      float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);
+      float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+      dir = min(vec2(FXAA_SPAN_MAX), max(vec2(-FXAA_SPAN_MAX), dir * rcpDirMin)) * texel;
+
+      // 沿方向混合两档；rgbB 若跳出亮度区间就回退到 rgbA（避免过冲）
+      vec3 rgbA = 0.5 * (texture2D(tDiffuse, vUv + dir * (1.0 / 3.0 - 0.5)).rgb +
+                         texture2D(tDiffuse, vUv + dir * (2.0 / 3.0 - 0.5)).rgb);
+      vec3 rgbB = rgbA * 0.5 + 0.25 * (texture2D(tDiffuse, vUv - dir * 0.5).rgb +
+                                       texture2D(tDiffuse, vUv + dir * 0.5).rgb);
+      float lumaB = luma(rgbB);
+      gl_FragColor = vec4((lumaB < lumaMin || lumaB > lumaMax) ? rgbA : rgbB, 1.0);
+    }
+  `;
+
   class PostFX {
     constructor(renderer, opts) {
       opts = opts || {};
@@ -161,6 +226,15 @@
       this.rtBright = this._makeRT(type);
       this.blurA = this.levels.map(() => this._makeRT(type));
       this.blurB = this.levels.map(() => this._makeRT(type));
+
+      // LDR 缓冲：COMPOSITE 的 sRGB 结果先写这里，再由 FXAA 输出到屏幕。
+      // 8bit 足够——色调映射后已经是显示值，FXAA 也按显示亮度做边缘判断。
+      this.rtLDR = new THREE.WebGLRenderTarget(1, 1, {
+        type: THREE.UnsignedByteType,
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+        depthBuffer: false, stencilBuffer: false
+      });
+      this.rtLDR.texture.generateMipmaps = false;
 
       // 全屏四边形
       this.quadScene = new THREE.Scene();
@@ -213,6 +287,18 @@
         fragmentShader: COMPOSITE_FS,
         depthTest: false, depthWrite: false
       });
+
+      // FXAA：COMPOSITE 之后唯一的额外全屏 pass，读 LDR 缓冲、画到屏幕
+      this.fxaaMat = new THREE.ShaderMaterial({
+        uniforms: {
+          tDiffuse: { value: this.rtLDR.texture },
+          uTexel: { value: new THREE.Vector2(1, 1) },
+          uResolution: { value: new THREE.Vector2(1, 1) }
+        },
+        vertexShader: FULLSCREEN_VS,
+        fragmentShader: FXAA_FS,
+        depthTest: false, depthWrite: false
+      });
     }
 
     _makeRT(type) {
@@ -236,7 +322,10 @@
         this.blurA[i].setSize(lw, lh);
         this.blurB[i].setSize(lw, lh);
       }
+      this.rtLDR.setSize(this.width, this.height);
       this.compositeMat.uniforms.uResolution.value.set(this.width, this.height);
+      this.fxaaMat.uniforms.uTexel.value.set(1 / this.width, 1 / this.height);
+      this.fxaaMat.uniforms.uResolution.value.set(this.width, this.height);
     }
 
     _blit(material, target) {
@@ -276,7 +365,6 @@
     }
 
     _post(srcTexture, p) {
-      const r = this.renderer;
       p = p || {};
 
       // 2. 亮度提取（半分辨率）
@@ -309,7 +397,7 @@
         this._blit(this.blurMat, this.blurA[i]);
       }
 
-      // 4. 合成到屏幕
+      // 4. 更新 COMPOSITE 参数
       const cu = this.compositeMat.uniforms;
       cu.tScene.value = srcTexture;
       cu.tBloom0.value = this.blurA[0].texture;
@@ -326,9 +414,11 @@
         cu.uBloomWeights2.value = p.bloomWeights[2];
       }
 
-      this.quad.material = this.compositeMat;
-      r.setRenderTarget(null);
-      r.render(this.quadScene, this.quadCamera);
+      // 5. COMPOSITE → LDR 缓冲（输出已经是 linearToSRGB 之后的显示值）
+      this._blit(this.compositeMat, this.rtLDR);
+
+      // 6. FXAA → 屏幕
+      this._blit(this.fxaaMat, null);
     }
 
     dispose() {
@@ -336,10 +426,12 @@
       this.rtBright.dispose();
       this.blurA.forEach(rt => rt.dispose());
       this.blurB.forEach(rt => rt.dispose());
+      this.rtLDR.dispose();
       this.geometry.dispose();
       this.brightMat.dispose();
       this.blurMat.dispose();
       this.compositeMat.dispose();
+      this.fxaaMat.dispose();
     }
   }
 

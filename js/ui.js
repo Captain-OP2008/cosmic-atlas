@@ -2,13 +2,15 @@
  * COSMOS ATLAS · 界面层（v2）
  * ------------------------------------------------------------
  * 职责：
- *   1) 按 COSMOS.CONTENT 把 13 个 section 渲染成 sticky 全屏版式；
+ *   1) 按 COSMOS.CONTENT 把 12 个 section 渲染成 sticky 全屏版式；
  *   2) 挂载 COSMOS.widgets 注册的章节组件（DOM 控件）；
  *   3) 章节导航 / HUD / 光标 / 进度条 / 灯箱 / 深链按钮；
  *   4) 把滚动进度 p 与可见度 o 分发到章节与 widget。
  *
  * 契约：docs/V2-PLAN.md §10
  *   - 章节结构：.ch-inner[layout-*] > .ch-scrim + .ch-copy + .ch-widget
+ *   - 互动章（BRIEF_CHAPTERS）：.ch-inner > .ch-brief（一句话）+ .ch-widget，
+ *     不生成 .ch-scrim/.ch-copy；正文收进 body 级 .ch-archive 浮层
  *   - .ch-widget 绝对铺满视口（pointer-events:none），子元素自行开启 auto
  *   - 组件：COSMOS.widgets[id](el, content, section) → { update(p, o) }
  * ============================================================ */
@@ -208,6 +210,12 @@
       li.appendChild(t('span', 'credits-note', T('Solar System Scope（CC BY 4.0），本地打包', 'Solar System Scope (CC BY 4.0), bundled locally')));
       list.appendChild(li);
     }
+    if (COSMOS.TEX && COSMOS.TEX.io) {
+      const li = t('li', 'credits-item');
+      li.appendChild(t('span', 'credits-name', T('卫星与冥王星贴图', 'Moon & Pluto textures')));
+      li.appendChild(t('span', 'credits-note', T('NASA / JPL / USGS / SwRI 派生地图；Ganymede、Callisto 由 Björn Jónsson 制作；Deimos 为 P. Stooke（CC0 1.0）', 'Derived NASA / JPL / USGS / SwRI maps; Ganymede & Callisto by Björn Jónsson; Deimos by P. Stooke (CC0 1.0)')));
+      list.appendChild(li);
+    }
     box.appendChild(list);
     box.appendChild(t('p', 'credits-foot', T('本站不联网、不追踪；所有影像均存储于本地。', 'No network requests, no tracking — all imagery is stored locally.')));
     return box;
@@ -215,6 +223,9 @@
 
   /* 章节版式：lab 类章节内容较长，改为文档流（3D 留在背景），不锁一屏 */
   const FLOW_CHAPTERS = { compare: 1, history: 1, vehicles: 1, future: 1 };
+  /* 互动章：首屏只留左上角一句话，长正文收进「章节档案」浮层。
+     只认这两个 section id，其余章节仍走 .ch-scrim + .ch-copy 原路径。 */
+  const BRIEF_CHAPTERS = { solar: 1, collision: 1 };
   /* 文档流章节的右栏影像：让首屏不是纯文字，同时给实验室一个视觉锚点 */
   const FLOW_BANNERS = {
     compare: { src: 'assets/photos/human-blue-marble.jpg', cap: T('阿波罗 17 号 · 蓝色弹珠，1972 · NASA', 'Apollo 17 · Blue Marble, 1972 · NASA') },
@@ -224,40 +235,49 @@
   };
 
   function renderStandard(section, c) {
+    const key = section.id.replace('ch-', '');
     const layout = c.layout || 'split';
-    const flow = !!(FLOW_CHAPTERS[section.id.replace('ch-', '')] || c.flow);
+    const flow = !!(FLOW_CHAPTERS[key] || c.flow);
+    // 互动章只保留左上角一句话；h2 语义保留，正文进「章节档案」浮层
+    const brief = !flow && !!BRIEF_CHAPTERS[key];
     if (flow) section.classList.add('is-flow');
+    if (brief) section.classList.add('is-brief');
     const inner = t('div', 'ch-inner layout-' + layout);
 
-    const scrim = t('div', 'ch-scrim');
-    scrim.setAttribute('aria-hidden', 'true');
-    inner.appendChild(scrim);
+    if (!brief) {
+      const scrim = t('div', 'ch-scrim');
+      scrim.setAttribute('aria-hidden', 'true');
+      inner.appendChild(scrim);
+    }
 
-    const copy = t('div', 'ch-copy');
-    copy.appendChild(tagLine(c, section));
-    const title = t('h2', 'ch-title');
-    title.appendChild(t('span', 'ch-title-cn', c.title || section.dataset.name || ''));
-    if (c.titleEn) title.appendChild(t('span', 'ch-title-en', c.titleEn));
-    copy.appendChild(title);
+    let copy = null;
+    if (!brief) {
+      copy = t('div', 'ch-copy');
+      copy.appendChild(tagLine(c, section));
+      const title = t('h2', 'ch-title');
+      title.appendChild(t('span', 'ch-title-cn', c.title || section.dataset.name || ''));
+      if (c.titleEn) title.appendChild(t('span', 'ch-title-en', c.titleEn));
+      copy.appendChild(title);
 
-    if (c.lead) copy.appendChild(t('p', 'ch-lead', c.lead));
+      if (c.lead) copy.appendChild(t('p', 'ch-lead', c.lead));
 
-    (c.paragraphs || []).forEach(function (p) {
-      const el = t('p', 'ch-text');
-      el.innerHTML = richText(p);
-      copy.appendChild(el);
-    });
+      (c.paragraphs || []).forEach(function (p) {
+        const el = t('p', 'ch-text');
+        el.innerHTML = richText(p);
+        copy.appendChild(el);
+      });
 
-    if (c.facts && c.facts.length) copy.appendChild(factList(c.facts));
+      if (c.facts && c.facts.length) copy.appendChild(factList(c.facts));
 
-    const q = quoteBlock(c.quote);
-    if (q) copy.appendChild(q);
+      const q = quoteBlock(c.quote);
+      if (q) copy.appendChild(q);
 
-    const hint = hintLine(c.hint);
-    if (hint) copy.appendChild(hint);
+      const hint = hintLine(c.hint);
+      if (hint) copy.appendChild(hint);
+    }
 
     if (flow) {
-      const ban = FLOW_BANNERS[section.id.replace('ch-', '')];
+      const ban = FLOW_BANNERS[key];
       if (ban) {
         const fig = t('figure', 'ch-banner');
         const img = t('img', 'ch-banner-img');
@@ -270,7 +290,11 @@
       }
     }
 
-    inner.appendChild(copy);
+    if (brief) {
+      inner.appendChild(briefBlock(section, c));
+    } else {
+      inner.appendChild(copy);
+    }
 
     if (c.widget) {
       const w = t('div', 'ch-widget');
@@ -309,7 +333,7 @@
   /* ============================================================
    * 导航 / HUD
    * ============================================================ */
-  const PART_KEYS = { '序章': 0, 'Prologue': 0, 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, '终章': 6, 'Finale': 6 };
+  const PART_KEYS = { '序章': 0, 'Prologue': 0, 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 5, '终章': 6, 'Finale': 6 };
 
   function renderNav() {
     navEl = doc.getElementById('nav');
@@ -451,6 +475,156 @@
   }
 
   /* ============================================================
+   * 互动章（02/04/06/08）：左上角一句话 + 章节档案浮层
+   * - 首屏不出现正文，只有「章号 · 章名 / 英文名」+ 一句话 + 小按钮
+   * - 正文（lead/paragraphs/facts/quote/hint）收进 body 级 role=dialog
+   * - 焦点管理与 Esc/遮罩关闭沿用灯箱同一套做法
+   * ============================================================ */
+  /* 章标签：中文模式中英并列，英文模式不回显中文，避免中英混排 */
+  function fillChapterLabel(el, c, section) {
+    el.appendChild(t('span', 'ch-brief-num', c.num || section.dataset.num || ''));
+    el.appendChild(t('span', 'ch-brief-sep', '·'));
+    el.appendChild(t('span', 'ch-brief-name', c.title || section.dataset.name || ''));
+    const alt = COSMOS.i18n && COSMOS.i18n.en ? '' : (c.titleEn || '');
+    if (alt) el.appendChild(t('span', 'ch-brief-en', '/ ' + alt));
+    return el;
+  }
+
+  /* 一句话：优先 oneLiner；字段缺失时从 lead 截一句，不新增文案来源 */
+  function oneLinerOf(c) {
+    if (c.oneLiner) return c.oneLiner;
+    const cut = (c.lead || '').split(/[。！？]/)[0];
+    return cut.length > 40 ? cut.slice(0, 39) + '…' : cut;
+  }
+
+  function briefBlock(section, c) {
+    const box = t('div', 'ch-brief');
+    box.appendChild(fillChapterLabel(t('h2', 'ch-brief-title'), c, section));
+    const line = oneLinerOf(c);
+    if (line) box.appendChild(t('p', 'ch-brief-line', line));
+    const btn = t('button', 'ch-brief-btn');
+    btn.type = 'button';
+    btn.setAttribute('aria-haspopup', 'dialog');
+    btn.setAttribute('aria-label', T('打开章节档案：', 'Open chapter file: ') + (c.title || section.dataset.name || ''));
+    btn.appendChild(t('span', 'ch-brief-btn-icon', 'ⓘ'));
+    btn.appendChild(t('span', 'ch-brief-btn-label', T('章节档案', 'Chapter file')));
+    btn.addEventListener('click', function () { openArchive(section, c, btn); });
+    box.appendChild(btn);
+    return box;
+  }
+
+  let archive = null;
+  let archiveOpener = null;
+
+  function ensureArchive() {
+    if (archive) return archive;
+    archive = t('div', 'ch-archive');
+    archive.setAttribute('role', 'dialog');
+    archive.setAttribute('aria-modal', 'true');
+    archive.setAttribute('aria-labelledby', 'ch-archive-title');
+    // data-ui：boot.js 据此把指针/滚轮让给浮层，不落到背后的 3D 场景
+    archive.setAttribute('data-ui', 'archive');
+    archive.hidden = true;
+    const panel = t('div', 'ch-archive-panel');
+    const head = t('div', 'ch-archive-head');
+    head.appendChild(t('p', 'ch-archive-kicker', T('章节档案', 'CHAPTER FILE')));
+    const title = t('h3', 'ch-archive-title');
+    title.id = 'ch-archive-title';
+    head.appendChild(title);
+    const close = t('button', 'ch-archive-close');
+    close.type = 'button';
+    close.setAttribute('aria-label', T('关闭章节档案', 'Close chapter file'));
+    close.textContent = '×';
+    close.addEventListener('click', closeArchive);
+    head.appendChild(close);
+    panel.appendChild(head);
+    panel.appendChild(t('div', 'ch-archive-body'));
+    archive.appendChild(panel);
+    doc.body.appendChild(archive);
+    archive.addEventListener('click', function (e) {
+      if (e.target === archive) closeArchive();
+    });
+    return archive;
+  }
+
+  function openArchive(section, c, opener) {
+    const m = ensureArchive();
+    const title = m.querySelector('.ch-archive-title');
+    clear(title);
+    fillChapterLabel(title, c, section);
+    const body = m.querySelector('.ch-archive-body');
+    clear(body);
+    if (c.lead) body.appendChild(t('p', 'ch-lead', c.lead));
+    (c.paragraphs || []).forEach(function (p) {
+      const el = t('p', 'ch-text');
+      el.innerHTML = richText(p);
+      body.appendChild(el);
+    });
+    if (c.facts && c.facts.length) body.appendChild(factList(c.facts));
+    const q = quoteBlock(c.quote);
+    if (q) body.appendChild(q);
+    const hint = hintLine(c.hint);
+    if (hint) body.appendChild(hint);
+
+    const active = doc.activeElement;
+    archiveOpener = opener || (active && active !== doc.body && !m.contains(active) ? active : null);
+    m.hidden = false;
+    const panel = m.querySelector('.ch-archive-panel');
+    if (panel) panel.scrollTop = 0;
+    doc.documentElement.classList.add('has-archive');
+    // 浮层打开期间由 keydown 捕获阶段独占键盘（boot.js 的 window 监听在冒泡阶段）
+    window.addEventListener('keydown', archiveKeyGuard, true);
+    // 焦点移入对话框，关闭后归还触发按钮（WCAG 2.4.3）
+    const close = m.querySelector('.ch-archive-close');
+    if (close) close.focus();
+  }
+
+  function closeArchive() {
+    if (!archive || archive.hidden) return;
+    archive.hidden = true;
+    doc.documentElement.classList.remove('has-archive');
+    window.removeEventListener('keydown', archiveKeyGuard, true);
+    const back = archiveOpener;
+    archiveOpener = null;
+    if (back && back.focus && doc.contains(back)) back.focus();
+  }
+
+  /* 浮层打开时键盘只归浮层：Tab 循环、Esc 只收浮层，其余键不外泄到场景/标签页 */
+  function archiveKeyGuard(e) {
+    if (!archive || archive.hidden) return;
+    if (e.key === 'Tab') {
+      trapArchiveTab(e);
+      e.stopPropagation();
+      return;
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closeArchive();
+      return;
+    }
+    e.stopPropagation();
+  }
+
+  /* Tab 在浮层内循环，不逃到背后的页面 */
+  function trapArchiveTab(e) {
+    if (!archive || archive.hidden) return false;
+    const items = lightboxFocusables(archive);
+    if (!items.length) return false;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const cur = doc.activeElement;
+    if (e.shiftKey && (cur === first || !archive.contains(cur))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (cur === last || !archive.contains(cur))) {
+      e.preventDefault();
+      first.focus();
+    }
+    return true;
+  }
+
+  /* ============================================================
    * 光标（沿用 v1 行为，仅 pointer:fine 启用）
    * ============================================================ */
   function initCursor() {
@@ -532,10 +706,21 @@
       if (e.target.closest && e.target.closest('.lightbox-close')) closeLightbox();
     });
     doc.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') { trapLightboxTab(e); return; }
-      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'Tab') {
+        if (trapArchiveTab(e)) return;
+        trapLightboxTab(e);
+        return;
+      }
+      if (e.key === 'Escape') {
+        // 浮层优先：有档案先收档案，再收灯箱（场景 reset 由 boot.js 广播）
+        closeArchive();
+        closeLightbox();
+      }
     });
-    COSMOS.on('cosmos:escape', closeLightbox);
+    COSMOS.on('cosmos:escape', function () {
+      closeArchive();
+      closeLightbox();
+    });
     // Esc 复位：场景之外，把本章控件的参数也交回默认（boot.js 广播）
     COSMOS.on('cosmos:reset', function () {
       const m = mounted[currentIndex];
@@ -549,6 +734,18 @@
     COSMOS.UI.meta = metas;
     COSMOS.UI.sections = sections;
     return metas;
+  }
+
+  // 3D 场景的投影标签层挂在 body 上（不是章节 DOM 内）：只在本章显示，避免串到别的章。
+  // 这些层由 scene-*.js 懒创建（preloadRest 之后才追加到 body），所以除了 setActive 时同步，
+  // 还要监听 body 新增节点，命中即按当前章节校正一次（否则深链直达时会残留上一层的标签）。
+  const BODY_LABEL_LAYERS = { 'sol-labels': 'ch-solar', 'coll-labels': 'ch-collision' };
+  function syncBodyLabelLayers(index) {
+    Object.keys(BODY_LABEL_LAYERS).forEach(function (layerId) {
+      const layer = doc.getElementById(layerId);
+      if (!layer) return;
+      layer.style.display = (sections[index] && sections[index].id === BODY_LABEL_LAYERS[layerId]) ? '' : 'none';
+    });
   }
 
   function setActive(index, metaArr) {
@@ -568,13 +765,18 @@
       if (on) b.setAttribute('aria-current', 'true');
       else b.removeAttribute('aria-current');
     });
-    updateHud(sections[index]);
-    // 太阳系场景的行星标签挂在 body 上：离开本章必须收起，避免串到别的章
-    const solLabels = doc.getElementById('sol-labels');
-    if (solLabels) {
-      const onSolar = !!(sections[index] && sections[index].id === 'ch-solar');
-      solLabels.style.display = onSolar ? '' : 'none';
+    // 12 章在窄视口下标签栏可横向滚动：键盘切章/深链进入时把当前标签滚进视野
+    const activeNav = navItems[index];
+    if (activeNav && activeNav.scrollIntoView) {
+      const reduce = COSMOS.ctx && COSMOS.ctx.reduceMotion;
+      try {
+        activeNav.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+      } catch (e) {
+        activeNav.scrollIntoView(false);
+      }
     }
+    updateHud(sections[index]);
+    syncBodyLabelLayers(index);
     closeLightbox();
     // 队友组件自建的灯箱/抽屉：广播一次 escape，让它们收起
     try { COSMOS.emit('cosmos:escape'); } catch (e) {}
@@ -601,6 +803,25 @@
 
   function setProgress(v) {
     if (railFill) railFill.style.transform = 'scaleY(' + Math.max(0, Math.min(1, v || 0)).toFixed(4) + ')';
+  }
+
+  // 懒加载的 stage 启动后会往 body 追加标签层：新增即按当前章节校正（深链直达时尤其必要）
+  if (typeof MutationObserver === 'function') {
+    const labelHost = doc.body || doc.documentElement;
+    if (labelHost) {
+      new MutationObserver(function (records) {
+        for (let i = 0; i < records.length; i++) {
+          const added = records[i].addedNodes;
+          for (let j = 0; j < added.length; j++) {
+            const node = added[j];
+            if (node && node.id && BODY_LABEL_LAYERS[node.id]) {
+              syncBodyLabelLayers(currentIndex);
+              return;
+            }
+          }
+        }
+      }).observe(labelHost, { childList: true });
+    }
   }
 
   COSMOS.UI = {

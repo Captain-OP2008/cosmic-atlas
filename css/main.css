@@ -2953,6 +2953,12 @@ body::after {
   .nav-num { margin-right: 6px; }
   .nav-txt { font-size: 11px; letter-spacing: 0.05em; }
 }
+/* 12 章在 1280 视口下会横向溢出：收紧标签内边距，保证整排标签可见 */
+@media (max-width: 1400px) and (min-width: 861px) {
+  .nav-item { padding-left: 8px; padding-right: 8px; gap: 5px; }
+  .nav-num { margin-right: 3px; }
+  .nav-txt { letter-spacing: 0.03em; }
+}
 
 /* ============================================================
  * v3.4 · 拉尼亚凯亚标签 + 拖拽防选字
@@ -3112,3 +3118,208 @@ body.is-dragging * {
   background: rgba(3, 7, 15, 0.46);
   padding: 1px 7px;
 }
+
+/* ==========================================================================
+   v3.3 互动章（02 / 04 / 06 / 08）：左上角一句话 + 章节档案浮层
+   —— 这四章不再生成 .ch-scrim（用户确认：文字直接压 3D），
+      靠极轻的双层 text-shadow 保可读；长正文收进 .ch-archive。
+   —— 渲染入口见 js/ui.js 的 BRIEF_CHAPTERS / briefBlock / openArchive。
+   ========================================================================== */
+
+/* ---- 左上角：章标签 + 一句话 + 章节档案入口 ---- */
+.chapter.is-brief .ch-inner.ch-inner {
+  align-items: flex-start;
+  padding-top: clamp(132px, 17vh, 184px);
+}
+
+.ch-brief {
+  position: relative;
+  z-index: 3;
+  width: min(430px, 34vw);
+  pointer-events: none;
+}
+
+.ch-brief-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--spacesuit-white);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 2px 12px rgba(0, 0, 0, 0.7);
+}
+.ch-brief-num { color: var(--carbon-30); }
+.ch-brief-sep { color: var(--carbon-40); }
+.ch-brief-name {
+  font-family: var(--font-ui);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.ch-brief-en {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  color: var(--carbon-30);
+}
+
+.ch-brief-line {
+  margin-top: var(--s2);
+  max-width: 30ch;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.72;
+  letter-spacing: 0.02em;
+  color: var(--spacesuit-white);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+.ch-brief-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s2);
+  padding: 5px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--spacesuit-white);
+  font-family: var(--font-ui);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+}
+.ch-brief-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--spacesuit-white);
+}
+.ch-brief-btn:active { transform: translateY(1px); }
+.ch-brief-btn:focus-visible { outline: 2px solid var(--spacesuit-white); outline-offset: 2px; }
+.ch-brief-btn-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* ---- 章节档案浮层（body 级 role=dialog，碳 90 底、白字、直角、可滚动） ---- */
+.ch-archive {
+  position: fixed;
+  inset: 0;
+  z-index: 92;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(16px, 6vh, 64px) clamp(16px, 5vw, 48px);
+  background: rgba(0, 0, 0, 0.78);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ch-archive[hidden] { display: none; }
+.has-archive { overflow: hidden; }
+
+.ch-archive-panel {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: calc(100vh - clamp(32px, 12vh, 128px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--s4) var(--s4);
+  background: var(--carbon-90);
+  border: 1px solid var(--carbon-70);
+  border-radius: 0;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+}
+.ch-archive-panel::-webkit-scrollbar { width: 7px; }
+.ch-archive-panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+
+.ch-archive-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px var(--s2);
+  align-items: start;
+  padding: var(--s3) 0 var(--s2);
+  background: var(--carbon-90);
+  border-bottom: 1px solid var(--carbon-70);
+}
+.ch-archive-kicker {
+  grid-column: 1 / -1;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--carbon-40);
+}
+.ch-archive-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--spacesuit-white);
+}
+.ch-archive-title .ch-brief-name {
+  font-size: var(--fs-18);
+  letter-spacing: 0.04em;
+}
+.ch-archive-close {
+  grid-column: 2;
+  grid-row: 2;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.ch-archive-close:hover { background: var(--carbon-80); }
+.ch-archive-close:focus-visible { outline: 2px solid var(--spacesuit-white); outline-offset: 2px; }
+
+.ch-archive-body { padding-top: var(--s3); }
+.ch-archive-body .ch-lead { margin: 0 0 var(--s3); }
+.ch-archive-body .ch-text + .ch-text { margin-top: var(--s2); }
+.ch-archive-body .ch-facts { margin-top: var(--s4); }
+
+/* ---- 窄屏：一句话占满宽度，浮层内边距收窄 ---- */
+@media (max-width: 860px) {
+  /* 与全站窄屏起点对齐（见 .chapter .ch-inner 的 126px 下限），避免压到顶部 HUD/标签栏 */
+  .chapter.is-brief .ch-inner.ch-inner { padding-top: clamp(126px, 16vh, 156px); }
+  .ch-brief { width: 100%; max-width: 100%; }
+  .ch-brief-line { max-width: 32ch; }
+  .ch-archive { padding: 0; }
+  .ch-archive-panel {
+    width: 100%;
+    max-height: 100vh;
+    min-height: 100vh;
+    padding: 0 var(--s3) var(--s3);
+    border-right: 0;
+    border-left: 0;
+    box-shadow: none;
+  }
+  .ch-archive-title .ch-brief-name { font-size: var(--fs-16); }
+}
+

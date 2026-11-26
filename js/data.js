@@ -33,6 +33,7 @@
 
   /* ---------------- 太阳 ---------------- */
   D.sun = {
+    id: 'sun', kind: 'star',
     name: '太阳', en: 'Sun', symbol: '☉',
     radiusKm: 696340,
     massKg: '1.989×10³⁰',
@@ -192,6 +193,110 @@
       atmosphere: [{ name: '氮', pct: 90 }, { name: '甲烷', pct: 9 }, { name: '一氧化碳', pct: 1 }],
       atmosphereNote: '极稀薄，近日点升华、远日点冻结。',
       missions: ['newhorizons']
+    }
+  ];
+
+  /* ---------------- 太阳系卫星（12 颗，02 章选择器/档案用） ----------------
+   * 半径 km；质量 kg；重力 m/s²；自转 h（大卫星多潮汐锁定）；公转 d；平均轨道半径 km。
+   * 位置不在这里算，由 COSMOS.ephem.moonRel(parent, id, jd) 提供。
+   * 口径：NASA Planetary Fact Sheet / JPL Solar System Dynamics（2025）。
+   */
+  D.moons = [
+    {
+      id: 'moon', name: '月球', en: 'Moon', parent: 'earth', symbol: '☾', texture: 'moon',
+      radiusKm: 1737.4, diameterKm: 3474.8, massKg: '7.35×10²²', gravity: 1.62,
+      dayHours: 708.7, periodDays: 27.32, distanceKm: 384400,
+      tagline: '地球唯一的天然卫星，也是我们唯一登陆过的另一个世界',
+      desc: '潮汐锁定，永远以同一面朝向地球。1969—1972 年，12 名宇航员在月面行走，带回 382 kg 样品。',
+      special: '它把地球的自转刹慢到 24 小时：4 亿年前的泥盆纪，一天只有约 22 小时。'
+    },
+    {
+      id: 'phobos', name: '火卫一', en: 'Phobos', parent: 'mars', symbol: '①', texture: 'phobos',
+      radiusKm: 11.27, diameterKm: 22.53, massKg: '1.07×10¹⁶', gravity: 0.0037,
+      dayHours: 7.65, periodDays: 0.319, distanceKm: 9376,
+      tagline: '一天绕火星三圈的碎块',
+      desc: '形状不规则，表面布满陨石坑和沟槽，可能是被捕获的小行星或一次巨大撞击的溅射物。',
+      special: '它的轨道每月下降约 1.8 cm，约 5000 万年后将撞上火星或碎成一道环。'
+    },
+    {
+      id: 'deimos', name: '火卫二', en: 'Deimos', parent: 'mars', symbol: '②', texture: 'deimos',
+      radiusKm: 6.2, diameterKm: 12.4, massKg: '1.48×10¹⁵', gravity: 0.003,
+      dayHours: 30.3, periodDays: 1.263, distanceKm: 23463,
+      tagline: '火星安静的小同伴',
+      desc: '比火卫一小得多，表面覆盖厚层尘土，撞击坑的边缘已被磨平。',
+      special: '从火星表面看，它只是一颗缓慢移动的亮星，而不是一轮明显的月亮。'
+    },
+    {
+      id: 'io', name: '木卫一', en: 'Io', parent: 'jupiter', symbol: 'Ⅰ', texture: 'io',
+      radiusKm: 1821.6, diameterKm: 3643.2, massKg: '8.93×10²²', gravity: 1.80,
+      dayHours: 42.46, periodDays: 1.769, distanceKm: 421700,
+      tagline: '太阳系火山活动最剧烈的天体',
+      desc: '超过 400 座活火山，硫化物把表面染成黄、橙、红；木星的潮汐加热把内部揉得滚烫。',
+      special: '火山羽流能喷到 300 km 高，物质最终被木星磁场电离，形成一圈等离子体环。'
+    },
+    {
+      id: 'europa', name: '木卫二', en: 'Europa', parent: 'jupiter', symbol: 'Ⅱ', texture: 'europa',
+      radiusKm: 1560.8, diameterKm: 3121.6, massKg: '4.80×10²²', gravity: 1.31,
+      dayHours: 85.23, periodDays: 3.551, distanceKm: 671034,
+      tagline: '冰壳下可能藏着比地球更多的液态水',
+      desc: '表面是光滑的冰，交错着棕红色裂纹；冰壳下约 100 km 深处可能存在全球性海洋。',
+      special: '欧罗巴快船 2024 年发射，计划 2030 年进入木星轨道，评估这片海洋是否宜居。'
+    },
+    {
+      id: 'ganymede', name: '木卫三', en: 'Ganymede', parent: 'jupiter', symbol: 'Ⅲ', texture: 'ganymede',
+      radiusKm: 2634.1, diameterKm: 5268.2, massKg: '1.48×10²³', gravity: 1.43,
+      dayHours: 171.7, periodDays: 7.155, distanceKm: 1070412,
+      tagline: '太阳系最大的卫星，比水星还大',
+      desc: '唯一拥有自身磁场的卫星，表面由古老暗区与年轻的亮色沟槽地形拼成。',
+      special: '哈勃在 1990 年代发现它有稀薄氧气大气，氧来自冰面被辐射分解。'
+    },
+    {
+      id: 'callisto', name: '木卫四', en: 'Callisto', parent: 'jupiter', symbol: 'Ⅳ', texture: 'callisto',
+      radiusKm: 2410.3, diameterKm: 4820.6, massKg: '1.08×10²³', gravity: 1.24,
+      dayHours: 400.5, periodDays: 16.689, distanceKm: 1882709,
+      tagline: '太阳系撞击坑最密集的表面之一',
+      desc: '40 亿年来几乎没有地质活动，表面因此成为一份完整的撞击史档案。',
+      special: '它在木星强辐射带之外，被视为未来载人前哨的候选地点。'
+    },
+    {
+      id: 'enceladus', name: '土卫二', en: 'Enceladus', parent: 'saturn', symbol: 'Ⅱ', texture: 'enceladus',
+      radiusKm: 252.1, diameterKm: 504, massKg: '1.08×10²⁰', gravity: 0.11,
+      dayHours: 32.9, periodDays: 1.370, distanceKm: 237948,
+      tagline: '南极喷出冰羽的海洋世界',
+      desc: '南极裂缝喷出含盐冰粒，形成土星的一圈小白环；羽流中检出有机分子。',
+      special: '卡西尼号曾穿过羽流取样，测到盐水与硅酸盐颗粒，暗示地下存在热液活动。'
+    },
+    {
+      id: 'rhea', name: '土卫五', en: 'Rhea', parent: 'saturn', symbol: 'Ⅴ', texture: 'rhea',
+      radiusKm: 763.8, diameterKm: 1527.6, massKg: '2.31×10²¹', gravity: 0.26,
+      dayHours: 108.4, periodDays: 4.518, distanceKm: 527108,
+      tagline: '冰做的撞击坑世界',
+      desc: '密度只有 1.24 g/cm³，主要成分是水冰；表面明亮，却布满古老的撞击坑。',
+      special: '卡西尼 2008 年飞掠时测到稀薄氧气大气，来源是冰面被磁层粒子击碎。'
+    },
+    {
+      id: 'titan', name: '土卫六', en: 'Titan', parent: 'saturn', symbol: 'Ⅵ', texture: 'titan',
+      radiusKm: 2574.7, diameterKm: 5149.5, massKg: '1.35×10²³', gravity: 1.35,
+      dayHours: 382.7, periodDays: 15.945, distanceKm: 1221870,
+      tagline: '唯一有稠密大气与地表湖泊的卫星',
+      desc: '大气压比地球高约 45%，以氮气为主；甲烷参与降雨、河流与湖泊，形成第二套天气系统。',
+      special: '惠更斯号 2005 年降落并拍下地表，是人类首次在外太阳系天体着陆。'
+    },
+    {
+      id: 'triton', name: '海卫一', en: 'Triton', parent: 'neptune', symbol: 'Ⅰ', texture: 'triton',
+      radiusKm: 1353.4, diameterKm: 2706.8, massKg: '2.14×10²²', gravity: 0.78,
+      dayHours: 141.0, periodDays: 5.877, distanceKm: 354759,
+      tagline: '逆行公转的冰火山卫星',
+      desc: '唯一逆着母行星自转方向公转的大卫星，几乎可以确定是被海王星捕获的柯伊伯带天体。',
+      special: '旅行者 2 号 1989 年拍到黑色氮冰羽流，说明它至今仍有冰火山活动。'
+    },
+    {
+      id: 'charon', name: '冥卫一', en: 'Charon', parent: 'pluto', symbol: 'Ⅰ', texture: 'charon',
+      radiusKm: 606, diameterKm: 1212, massKg: '1.586×10²¹', gravity: 0.29,
+      dayHours: 153.3, periodDays: 6.387, distanceKm: 19591,
+      tagline: '与冥王星互相潮汐锁定的伴侣',
+      desc: '质量是冥王星的 12%，两者绕共同质心旋转，因此常被视为一个双矮行星系统。',
+      special: '新视野号 2015 年发现它的北极覆盖红棕色物质，来自冥王星逃逸的甲烷。'
     }
   ];
 
@@ -646,13 +751,36 @@
     { label: 'Solar System Scope 行星贴图（2048px）', org: 'Solar System Scope', license: 'CC BY 4.0' },
     { label: 'IAU 行星定义与卫星命名（2025）', org: 'IAU', license: 'CC BY 4.0' },
     { label: 'LIGO / Virgo 引力波观测', org: 'LIGO Scientific Collaboration', license: 'CC BY 4.0' },
-    { label: '拉尼亚凯亚超星系团（Tully et al. 2014, Nature）', org: 'University of Hawaii', license: '数据引用' }
+    { label: '拉尼亚凯亚超星系团（Tully et al. 2014, Nature）', org: 'University of Hawaii', license: '数据引用' },
+    { label: '卫星与冥王星全球地图（10 颗，1024×512）', org: 'NASA / JPL / USGS / SwRI / Björn Jónsson / P. Stooke', license: '公有领域 / CC0 1.0 / 署名使用' }
   ];
 
   D.planetById = function (id) {
     const all = D.planets.concat(D.dwarfPlanets);
     for (let i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
     return null;
+  };
+
+  D.moonById = function (id) {
+    for (let i = 0; i < D.moons.length; i++) if (D.moons[i].id === id) return D.moons[i];
+    return null;
+  };
+
+  D.moonsByParent = function (parent) {
+    const out = [];
+    for (let i = 0; i < D.moons.length; i++) {
+      if (D.moons[i].parent === parent) out.push(D.moons[i]);
+    }
+    return out;
+  };
+
+  /* 太阳 / 行星 / 矮行星 / 卫星统一查询，供 02 章档案与标签使用 */
+  D.bodyById = function (id) {
+    if (!id) return null;
+    if (id === 'sun') return D.sun;
+    const p = D.planetById(id);
+    if (p) return p;
+    return D.moonById(id);
   };
 
   D.missionById = function (id) {

@@ -2,13 +2,13 @@
 
 > **标签页切章，动手才能看见剩下的部分。**
 > 本文件是项目最高规范。改任何代码前，先读 §1 与 §6。适用范围：`cosmic-atlas/` 全仓库。
-> 最后更新 2026-11-24。v3 已上线：11 章标签页、四色斜切幕布转场、精细建模。规则改了，就在同一次改动里更新本文件。
+> 最后更新 2026-11-25。v3 已上线：12 章标签页、四色斜切幕布转场、精细建模。规则改了，就在同一次改动里更新本文件。
 
 ---
 
 ## 0. 目标与优先级
 
-**项目**：中文宇宙科普站。v3 是 11 章、五个部分的互动图谱（three.js 场景 + 真实行星贴图与 NASA 照片 + 顶部标签页切换与四色斜切幕布转场，双击 `index.html` 就能看、断网也能看）。v1 的 11 章版本存档在 `.backup-v1/`，不再维护。
+**项目**：中文宇宙科普站。v3 是 12 章、五个部分的互动图谱（three.js 场景 + 真实行星贴图与 NASA 照片 + 顶部标签页切换与四色斜切幕布转场，双击 `index.html` 就能看、断网也能看）。v1 的 11 章版本存档在 `.backup-v1/`，不再维护。
 
 **三条硬指标，编号即优先级：**
 
@@ -150,15 +150,16 @@
 |---|---|---|---|
 | 00 | 序章 · COSMOS | L2 | 拖动银河（惯性）、双指/滚轮缩放、点击核球俯冲进第一章 |
 | 01 | 宇宙总览 · THE COSMOS | L2 | 拖动拉尼亚凯亚丝绸质感金色纤维流（ribbon 单 pass，约 25 万三角）、滚轮缩放、点击金色标签展开说明 |
-| 02 | 太阳系 · THE SOLAR SYSTEM | L3 | 360° 拖拽、时间滑杆、点击行星开档案抽屉 |
+| 02 | 太阳系 · THE SOLAR SYSTEM | L3 | 真实星历日期跳转/倒放/8 档速度、三档视角、12 颗卫星、点行星/卫星开档案、天象事件与今晚天空 |
 | 03 | 行星对比 · PLANET LAB | L3 | 地球 vs 任意行星：大小 / 体重 / 大气堆叠条 |
 | 04 | 致密天体 · COMPACT OBJECTS | L3 | 天体切换 + 质量滑杆：史瓦西半径与吸积盘实时变化 |
 | 05 | 星系动物园 · GALAXY ZOO | L2 | 形态切换 + 照片灯箱（哈勃 / 韦布原图） |
-| 06 | 极端宇宙 · EXTREME UNIVERSE | L3 | 引力波 / 暗物质 / 暗能量三模式 + 参数滑杆 |
-| 07 | 航天里程碑 · HISTORY | L3 | 1957–2024 时间轴拖动与播放，星云里的目标点逐颗点亮 |
-| 08 | 现役与未来载具 · VEHICLES | L2 | 真实高度条形图、按类型筛选（火箭 / 望远镜 / 空间站）、点开档案抽屉 |
-| 09 | 未来计划 · WHAT'S NEXT | L3 | 火星旅行时间与体重计算器 |
-| 10 | 终章 · PALE BLUE DOT | L1 | 地球缓慢自转（约 100 秒/圈），回望那张 1990 年的照片 |
+| 06 | 星系碰撞 · GALAXY COLLISION | L3 | 星系碰撞沙盒：6 场景 + 自设参数（质量比 / 最近距离 / 自旋 / 倾角）、1.2 万恒星 N 体、时间倒放、分享深链 |
+| 07 | 极端宇宙 · EXTREME UNIVERSE | L3 | 引力波 / 暗物质 / 暗能量三模式 + 参数滑杆 |
+| 08 | 航天里程碑 · HISTORY | L3 | 1957–2024 时间轴拖动与播放，星云里的目标点逐颗点亮 |
+| 09 | 现役与未来载具 · VEHICLES | L2 | 真实高度条形图、按类型筛选（火箭 / 望远镜 / 空间站）、点开档案抽屉 |
+| 10 | 未来计划 · WHAT'S NEXT | L3 | 火星旅行时间与体重计算器 |
+| 11 | 终章 · PALE BLUE DOT | L1 | 地球缓慢自转（约 100 秒/圈），回望那张 1990 年的照片 |
 
 ### 3.3 质量红线（逐条可验）
 
@@ -226,7 +227,7 @@
 - 双击 `index.html` 即可运行（`file://`）；经典 `<script>`，禁止 ESM / `import` / `export` / `type="module"`。
 - three.js r169 全局 `window.THREE`；**无 addons**（OrbitControls / EffectComposer / GLTFLoader 等都不用）。
 - 零网络请求：纹理、字体、数据全部本地或程序化；禁止字体 CDN、第三方脚本、新 npm 依赖、构建步骤。
-- **真实影像例外（v2 起）**：允许使用公共领域的真实影像，但必须本地打包、仍然零网络。行星贴图以 data URL 内联进 `js/tex-solar.js`（`file://` 下 WebGL 读本地图片会 taint）；照片放 `assets/photos/` 由 `<img>` 加载。08 章载具档案另允许"署名即可使用"的官方素材（CC BY / CC0 / ESA Standard Licence / 中国官方发布），必须在图注与抽屉来源行写明出处；不得引入版权受限素材（如 ESO 的 EHT 照片）。使用范围与署名全部登记在 README「数据与影像来源」。
+- **真实影像例外（v2 起）**：允许使用公共领域的真实影像，但必须本地打包、仍然零网络。行星贴图以 data URL 内联进 `js/tex-solar.js`（`file://` 下 WebGL 读本地图片会 taint）；照片放 `assets/photos/` 由 `<img>` 加载。09 章载具档案另允许"署名即可使用"的官方素材（CC BY / CC0 / ESA Standard Licence / 中国官方发布），必须在图注与抽屉来源行写明出处；不得引入版权受限素材（如 ESO 的 EHT 照片）。使用范围与署名全部登记在 README「数据与影像来源」。
 
 ### 5.2 舞台接口
 
@@ -252,37 +253,45 @@ COSMOS.registerStage('sun', function (ctx) {
 ### 5.4 文件地图（当前准确版）
 
 ```
-index.html              页面骨架：11 个 section，data-stage 决定场景
+index.html              页面骨架：12 个 section，data-stage 决定场景
 css/
   main.css              token、HUD、顶部标签栏、四色幕布、v3 面板布局与公共组件
-  solar.css / deep.css / cosmos.css / human.css
+  solar.css / solar-sky.css / collision.css / deep.css / cosmos.css / human.css
                         各部分的专属样式（只写 .xx-* 前缀类，不覆盖公共类）
 js/
   glsl-lib.js           共享 GLSL
   lib-core.js           stage/widget/content 注册表、事件总线、DOM、纹理加载、拾取
   tex-solar.js          13 张行星贴图（data URL）
+  tex-moons.js          13 张卫星/冥王星/银河贴图（data URL，紧随 tex-solar.js）
+  ephem.js              星历引擎：JPL 近似行星根数 + Meeus 月球 + 卫星/天象/天空坐标（1800–2100）
+  galaxy-model.js       星系碰撞模型（Toomre 限制性 N 体）：6 场景 / 1.2 万恒星初始条件 / 积分 / 分享编码
   data.js               全站唯一数据源
   i18n.js               双语层：语言检测（`?lang=` / localStorage）、`T(zh,en)` 双参数翻译、静态文案与章节名替换、HUD 切换按钮
   data-en.js            英文模式的数据覆盖层（紧随 data.js，按 id / 数组索引覆盖英文字段）
-  content-en.js         英文模式的 11 章文案覆盖层（紧随 content-*.js，覆盖 title / part / lead / paragraphs / facts 等）
-  content-core/solar/deep/cosmos/human.js   文案与控件
+  content-en.js         英文模式的 12 章文案覆盖层（紧随 content-*.js，覆盖 title / part / lead / paragraphs / facts 等）
+  content-core/solar/deep/cosmos/human/collision.js   文案与控件
   scene-ambient.js      starfield / idle
   scene-hero.js         hero
   scene-overview.js     overview（拉尼亚凯亚超星系团：丝绸 ribbon 纤维 1000+ 条/约 25 万三角 + 金色标签，标签亚像素同帧跟随）
   scene-finale-earth.js paleblue（终章：自动自转地球，日面/夜灯/云层/大气）
   scene-nebula.js       nebula（旧终章星云，现无章节引用，保留 deepfield 别名）
-  nebula-bg.js          星云背景工厂：航天里程碑 / 载具 / 未来计划三章共用（标签 09–11，data-stage explore1/2/3），配色 / 构图 / 年份联动参数化
+  nebula-bg.js          星云背景工厂：航天里程碑 / 载具 / 未来计划三章共用（标签 08–10，data-stage explore1/2/3），配色 / 构图 / 年份联动参数化
   scene-solarsystem.js  solar
   scene-compact.js      compact
   scene-galaxies.js     galaxies
   scene-extreme.js      extreme
+  scene-collision.js    collision（06 章星系碰撞：两核 + 1.2 万恒星 / 轨迹层 / 速度色 / 相机 / 时间轴）
   scene-explore.js      explore1/2/3
-  feat-solar/compare/deep/cosmos/human.js   各章控件
+  feat-solar/compare/deep/cosmos/human/collision.js   各章控件
+  feat-collision.js     06 章星系碰撞控件（场景 / 自设参数 / 时间 / 显示开关 / 详情 / 分享）
+  feat-events.js        02 章天象事件模态（#sol-events）
+  feat-sky.js           02 章今晚天空模态（#sol-sky：地点/时刻/地平线图/月相/JSON 导出）
   postfx.js             后处理
-  ui.js                 11 章 DOM 渲染、顶部标签栏、HUD、灯箱、光标
+  ui.js                 12 章 DOM 渲染、顶部标签栏、HUD、灯箱、光标
   boot.js               渲染器、主循环、标签页状态机、四色幕布转场、懒加载、输入层、性能自适应
 assets/photos/          49 张照片（NASA 公共领域为主，另有 ESA / CC BY / CC0 / 中国官方署名图）
-tools/                  贴图与照片构建脚本（Python + Pillow）
+assets/textures/        卫星/冥王星全球地图源图与最终 jpg（PD/CC0/CC BY/署名）
+tools/                  贴图与照片构建脚本（Python + Pillow）、ephem-test.js
 vendor/three.global.js  three.js r169
 shots/                  验收截图
 .backup-v1/             v1 存档，不参与构建

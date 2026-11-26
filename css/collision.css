@@ -1,0 +1,474 @@
+/* ==========================================================================
+   06 · 星系碰撞 / GALAXY COLLISION —— 控件面板样式
+   作用域：全部选择器都锁在 #ch-collision 内，避免与其它章节的 .coll-* 冲突。
+   视觉：只取 :root token（carbon / NASA 蓝红 / 白），直角 0–2px；
+        禁止玻璃拟态、胶囊、彩虹渐变、霓虹与投影。
+   布局：右侧面板，1280×720 不遮左栏 .ch-copy、不压 HUD / 导航；
+        <1100px 收成底部抽屉，可折叠。
+   ========================================================================== */
+
+/* ---------- 根节点 ---------- */
+#ch-collision .coll-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none; /* 面板外仍可拖拽场景 */
+  font-family: var(--font-ui);
+  color: var(--spacesuit-white);
+}
+
+/* ---------- 面板 ---------- */
+#ch-collision .coll-panel {
+  position: absolute;
+  top: 96px;
+  right: clamp(20px, 3vw, 48px);
+  width: 360px;
+  max-height: calc(100vh - 180px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--carbon-60) transparent;
+  box-sizing: border-box;
+  padding: 12px;
+  pointer-events: auto;
+  background: var(--carbon-90);
+  border: 1px solid var(--carbon-70);
+  border-radius: 0;
+}
+
+#ch-collision .coll-panel *,
+#ch-collision .coll-panel *::before,
+#ch-collision .coll-panel *::after {
+  box-sizing: border-box;
+}
+
+#ch-collision .coll-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+#ch-collision .coll-panel::-webkit-scrollbar-thumb {
+  background: var(--carbon-60);
+  border-radius: 0;
+}
+
+#ch-collision .coll-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- 头部 ---------- */
+#ch-collision .coll-head {
+  margin-bottom: 4px;
+}
+
+#ch-collision .coll-kicker {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+#ch-collision .coll-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#ch-collision .coll-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--spacesuit-white);
+}
+
+/* 折叠按钮只在抽屉形态出现 */
+#ch-collision .coll-fold {
+  display: none;
+}
+
+/* ---------- 分区 ---------- */
+#ch-collision .coll-sec {
+  display: block;
+  padding: 10px 0;
+  border-top: 1px solid var(--carbon-80);
+}
+
+#ch-collision .coll-sec[hidden] {
+  display: none;
+}
+
+#ch-collision .coll-head + .coll-sec {
+  border-top: 1px solid var(--carbon-70);
+  margin-top: 8px;
+}
+
+#ch-collision .coll-sec-title {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* ---------- 通用控件 ---------- */
+#ch-collision .coll-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  background: transparent;
+  color: var(--spacesuit-white);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out),
+              border-color var(--dur-1) var(--ease-out);
+}
+
+#ch-collision .coll-btn:hover {
+  border-color: var(--carbon-40);
+  background: rgba(255, 255, 255, .06);
+}
+
+#ch-collision .coll-btn:active {
+  transform: translateY(1px);
+}
+
+#ch-collision .coll-btn:focus-visible,
+#ch-collision .coll-tgl:focus-visible,
+#ch-collision .coll-fold:focus-visible,
+#ch-collision .coll-sel:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+#ch-collision .coll-btn:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+#ch-collision .coll-btn:disabled:hover {
+  border-color: var(--carbon-60);
+  background: transparent;
+}
+
+/* 倒放 / 暂停处于激活态：白描边 + 浅白底（不用强调色） */
+#ch-collision .coll-btn.is-on {
+  border-color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, .14);
+}
+
+/* 下拉框 */
+#ch-collision .coll-sel {
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  padding: 0 6px;
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  background: var(--carbon-black);
+  color: var(--spacesuit-white);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#ch-collision .coll-sel option,
+#ch-collision .coll-sel optgroup {
+  background: var(--carbon-90);
+  color: var(--spacesuit-white);
+}
+
+/* 行 / 字段 */
+#ch-collision .coll-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#ch-collision .coll-row + .coll-row {
+  margin-top: 6px;
+}
+
+#ch-collision .coll-play {
+  flex: 1 1 auto;
+  font-size: 12px;
+}
+
+#ch-collision .coll-field {
+  margin-top: 8px;
+}
+
+#ch-collision .coll-field:first-of-type {
+  margin-top: 0;
+}
+
+#ch-collision .coll-lab {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* 速度读数（当前 Myr/秒） */
+#ch-collision .coll-rate {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#ch-collision .coll-rate-k {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+#ch-collision .coll-rate-v,
+#ch-collision #coll-rate {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  color: var(--spacesuit-white);
+}
+
+/* 工具按钮栅格 */
+#ch-collision .coll-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#ch-collision .coll-grid .coll-btn {
+  width: 100%;
+}
+
+/* 显示开关 */
+#ch-collision .coll-tgls {
+  display: flex;
+  gap: 6px;
+}
+
+#ch-collision .coll-tgl {
+  flex: 1 1 0;
+  min-height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out),
+              border-color var(--dur-1) var(--ease-out);
+}
+
+#ch-collision .coll-tgl:hover {
+  border-color: var(--carbon-40);
+  background: rgba(255, 255, 255, .06);
+}
+
+#ch-collision .coll-tgl.is-on {
+  border-color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, .14);
+  color: var(--spacesuit-white);
+}
+
+/* ---------- 场景说明 ---------- */
+#ch-collision .coll-desc {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fg-3);
+}
+
+#ch-collision .coll-desc[hidden] {
+  display: none;
+}
+
+/* ---------- 详情 ---------- */
+#ch-collision .coll-kv {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  margin: 0;
+}
+
+#ch-collision .coll-kv dt {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+#ch-collision .coll-kv dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--spacesuit-white);
+}
+
+/* ---------- 底部提示 ---------- */
+#ch-collision .coll-hint {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--carbon-80);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: .08em;
+  color: var(--fg-3);
+}
+
+/* ---------- Toast ---------- */
+#ch-collision .coll-toast {
+  position: absolute;
+  right: clamp(20px, 3vw, 48px);
+  bottom: 24px;
+  z-index: 20;
+  max-width: 340px;
+  padding: 8px 10px;
+  background: var(--carbon-80);
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+  pointer-events: none;
+}
+
+#ch-collision .coll-toast[hidden] {
+  display: none;
+}
+
+/* ==========================================================================
+   窄屏：底部抽屉形态
+   ========================================================================== */
+@media (max-width: 1100px) {
+  /* 抽屉盖在正文上：.ch-widget（z2）在 .ch-copy（z3）之下，正文会压到抽屉上。
+     这是本章唯一一处对公共容器的章节级作用域微调，仅在窄屏抽屉形态生效。 */
+  #ch-collision .ch-widget {
+    z-index: 4;
+  }
+
+  #ch-collision .coll-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    max-width: none;
+    max-height: 46vh;
+  }
+
+  #ch-collision .coll-fold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 0 8px;
+    border: 1px solid var(--carbon-60);
+    border-radius: 0;
+    background: transparent;
+    color: var(--fg-2);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  #ch-collision .coll-fold:hover {
+    border-color: var(--carbon-40);
+  }
+
+  /* 折叠后只留标题行 */
+  #ch-collision .coll-panel.is-folded {
+    max-height: none;
+  }
+
+  #ch-collision .coll-panel.is-folded .coll-sec,
+  #ch-collision .coll-panel.is-folded .coll-hint {
+    display: none;
+  }
+
+  #ch-collision .coll-toast {
+    top: 110px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+/* 超窄屏：防止任何横向溢出 */
+@media (max-width: 420px) {
+  #ch-collision .coll-panel {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    padding: 10px;
+  }
+
+  #ch-collision .coll-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #ch-collision .coll-tgls {
+    flex-wrap: wrap;
+  }
+
+  #ch-collision .coll-tgl {
+    flex: 1 1 30%;
+  }
+}
+
+/* ==========================================================================
+   降低动效
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  #ch-collision .coll-btn,
+  #ch-collision .coll-tgl,
+  #ch-collision .coll-fold {
+    transition: none;
+  }
+
+  #ch-collision .coll-btn:active {
+    transform: none;
+  }
+}
