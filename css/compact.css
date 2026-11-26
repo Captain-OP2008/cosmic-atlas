@@ -1,0 +1,601 @@
+/* ============================================================
+ * COSMOS ATLAS · 04 致密天体 / 黑洞模拟器 · 控制台样式
+ * ------------------------------------------------------------
+ * 作用域：#ch-compact（所有选择器都带前缀，避免命中 03 章 compare
+ * 控件同名的 .cmp-* 规则；solar.css 里 03 章的 .cmp-* 在
+ * #ch-compare 内，互不影响）。
+ * 视觉：NASA 腔——carbon 底 + 白字 + NASA 蓝/红各 ≤2 处强调；
+ * 直角 0/2px；无玻璃拟态、无胶囊、无多层投影、无自创色。
+ * 布局：右侧固定宽度 clamp(320px, 27vw, 400px)（1440 → 389px、1280 → 346px、
+ * 1080 → 340px），top:112px / bottom:24px；≤1080px 收窄档、≤860px 全宽。
+ * 首屏可见工具条、10 场景、相机、时间、Details 首行；Details 是唯一滚动区。
+ * ============================================================ */
+
+#ch-compact .bh-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  font-family: var(--font-ui);
+  color: var(--fg);
+}
+
+#ch-compact .bh-ui [hidden] { display: none !important; }
+
+#ch-compact .cmp-console {
+  position: absolute;
+  left: auto;
+  right: 24px;
+  top: 112px;
+  bottom: 24px;
+  width: clamp(320px, 27vw, 400px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px 12px;
+  background: var(--carbon-90);
+  border: 1px solid var(--carbon-70);
+  border-radius: 0;
+  pointer-events: auto;
+  overflow: visible;
+}
+
+/* ---------------- 抬头 ---------------- */
+#ch-compact .cmp-console-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--carbon-80);
+}
+
+#ch-compact .cmp-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--nasa-blue-tint);
+}
+
+#ch-compact .cmp-kicker-latin {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.18em;
+  color: var(--fg-3);
+}
+
+/* ---------------- 通用按钮 ---------------- */
+#ch-compact .cmp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 3px 6px;
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease-out),
+              border-color var(--dur-1) var(--ease-out),
+              background-color var(--dur-1) var(--ease-out);
+}
+
+#ch-compact .cmp-btn:hover {
+  color: var(--spacesuit-white);
+  border-color: var(--carbon-40);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+#ch-compact .cmp-btn:active { transform: translateY(1px); }
+
+#ch-compact .cmp-btn:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+#ch-compact .cmp-btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+#ch-compact .cmp-btn:disabled:hover {
+  color: var(--fg-2);
+  border-color: var(--carbon-60);
+  background: transparent;
+}
+
+#ch-compact .cmp-btn.is-on {
+  color: var(--spacesuit-white);
+  border-color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------------- 工具条 ---------------- */
+#ch-compact .cmp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 6px;
+}
+
+#ch-compact .cmp-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+#ch-compact .cmp-tools-right { margin-left: auto; justify-content: flex-end; }
+
+#ch-compact .cmp-tgl { font-weight: 500; }
+
+/* 撤销剩余步数 */
+#ch-compact .cmp-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 4px;
+  background: var(--nasa-blue-tint);
+  color: var(--carbon-black);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- 场景 chips ---------------- */
+#ch-compact .cmp-scenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#ch-compact .cmp-scene {
+  padding: 3px 7px;
+  font-weight: 500;
+  color: var(--fg-2);
+}
+
+#ch-compact .cmp-scene.is-on {
+  color: var(--spacesuit-white);
+  border-color: var(--nasa-blue);
+  background: rgba(28, 103, 227, 0.16);
+}
+
+/* ---------------- 相机 / 时间 ---------------- */
+/* 相机 8 个动作固定 4 列两行：面板收到 320px 时 flex 折行只剩
+ * 1 个按钮单独占行（中文），英文在 389px 也会；固定列数避免错位。 */
+#ch-compact .cmp-cam {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+}
+
+#ch-compact .cmp-cam .cmp-btn { justify-content: center; }
+
+#ch-compact .cmp-time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+#ch-compact .cmp-zoom {
+  min-width: 26px;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+#ch-compact .cmp-speed {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+#ch-compact .cmp-time-out {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: var(--spacesuit-white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#ch-compact .cmp-time-out.is-paused { color: var(--nasa-red); }
+
+/* ---------------- 状态行 ---------------- */
+#ch-compact .cmp-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 8px;
+  border-left: 2px solid var(--nasa-blue);
+  background: rgba(28, 103, 227, 0.1);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--fg-2);
+}
+
+#ch-compact .cmp-status[data-kind="notice"] {
+  border-left-color: var(--nasa-red);
+  background: rgba(246, 65, 55, 0.1);
+}
+
+#ch-compact .cmp-status-text { min-width: 0; }
+
+#ch-compact .cmp-status .cmp-btn {
+  flex: none;
+  min-height: 20px;
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+/* ---------------- Details（唯一滚动区） ---------------- */
+#ch-compact .cmp-details {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-right: -4px;
+  padding-right: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--carbon-50) transparent;
+}
+
+#ch-compact .cmp-details::-webkit-scrollbar { width: 6px; }
+#ch-compact .cmp-details::-webkit-scrollbar-track { background: transparent; }
+#ch-compact .cmp-details::-webkit-scrollbar-thumb { background: var(--carbon-50); }
+
+#ch-compact .cmp-empty {
+  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--fg-3);
+}
+
+#ch-compact .cmp-stats {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+#ch-compact .cmp-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--carbon-80);
+}
+
+#ch-compact .cmp-row-k {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--fg-2);
+}
+
+#ch-compact .cmp-row-v {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+#ch-compact .cmp-sub {
+  margin: 10px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* ---------------- 对象列表 ---------------- */
+#ch-compact .cmp-objects {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#ch-compact .cmp-obj {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--carbon-70);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease-out),
+              border-color var(--dur-1) var(--ease-out),
+              background-color var(--dur-1) var(--ease-out);
+}
+
+#ch-compact .cmp-obj:hover {
+  color: var(--spacesuit-white);
+  border-color: var(--carbon-40);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+#ch-compact .cmp-obj.is-on {
+  color: var(--spacesuit-white);
+  border-color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#ch-compact .cmp-obj:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+#ch-compact .cmp-obj-m {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#ch-compact .cmp-obj.is-on .cmp-obj-m { color: var(--spacesuit-white); }
+
+/* ---------------- 对象编辑 ---------------- */
+#ch-compact .cmp-edit {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--carbon-70);
+}
+
+#ch-compact .cmp-edit-title { margin-top: 0; }
+
+#ch-compact .cmp-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  align-items: center;
+  margin: 0 0 6px;
+}
+
+#ch-compact .cmp-field-k {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+#ch-compact .cmp-field-v {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--spacesuit-white);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+#ch-compact .cmp-field .cmp-range {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 18px;
+  margin: 2px 0 0;
+  background: transparent;
+  accent-color: var(--nasa-blue);
+  cursor: pointer;
+}
+
+#ch-compact .cmp-field .cmp-range:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+#ch-compact .cmp-colors {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+#ch-compact .cmp-swatch {
+  width: 28px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease-out),
+              outline-color var(--dur-1) var(--ease-out);
+}
+
+#ch-compact .cmp-swatch:hover { border-color: var(--carbon-40); }
+
+#ch-compact .cmp-swatch.is-on {
+  border-color: var(--spacesuit-white);
+  outline: 1px solid var(--spacesuit-white);
+  outline-offset: 1px;
+}
+
+#ch-compact .cmp-swatch:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: 2px;
+}
+
+#ch-compact .cmp-del {
+  width: 100%;
+  justify-content: center;
+  margin-top: 2px;
+  border-color: var(--nasa-red-shade);
+  color: var(--nasa-red);
+}
+
+#ch-compact .cmp-del:hover {
+  border-color: var(--nasa-red);
+  background: rgba(246, 65, 55, 0.12);
+  color: var(--spacesuit-white);
+}
+
+/* ---------------- 底部提示 ---------------- */
+#ch-compact .cmp-hint {
+  margin: 0;
+  padding-top: 4px;
+  border-top: 1px solid var(--carbon-80);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+}
+
+/* ---------------- 下拉菜单 ---------------- */
+#ch-compact .cmp-menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+#ch-compact .cmp-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 30;
+  min-width: 172px;
+  padding: 4px 0;
+  background: var(--carbon-80);
+  border: 1px solid var(--carbon-60);
+  border-radius: 0;
+}
+
+#ch-compact .cmp-menu-label {
+  margin: 4px 10px 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+#ch-compact .cmp-menu-item {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease-out),
+              background-color var(--dur-1) var(--ease-out);
+}
+
+#ch-compact .cmp-menu-item:hover {
+  color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#ch-compact .cmp-menu-item:focus-visible {
+  outline: 2px solid var(--nasa-blue-tint);
+  outline-offset: -2px;
+  color: var(--spacesuit-white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#ch-compact .cmp-menu-item.is-on {
+  color: var(--spacesuit-white);
+  box-shadow: inset 2px 0 0 var(--nasa-blue);
+}
+
+/* 「添加」按钮不在工具条右缘：菜单右对齐会让 172px 宽的下拉在
+ * 窄面板里越过面板左缘；改为从触发按钮向右展开（任何宽度都够位）。 */
+#ch-compact .cmp-tools-right > .cmp-menu-wrap:first-child .cmp-menu {
+  right: auto;
+  left: 0;
+}
+
+/* 速度按钮在时间条中部，右对齐后内收 6px，避免菜单越过面板左缘
+ * （面板左右 padding 只有 10–12px，172px 菜单会把 1px 边框顶出去）。 */
+#ch-compact .cmp-time .cmp-menu { right: -6px; }
+
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 1080px) {
+  #ch-compact .cmp-console {
+    left: auto;
+    right: 14px;
+    top: 104px;
+    bottom: 14px;
+    width: min(340px, 34vw);
+    padding: 8px 10px;
+    gap: 5px;
+  }
+
+  /* 英文相机标签（From above ≈ 60px）在 34vw 收窄档最窄只剩 64.7px 一格：
+   * 内边距收到 4px 让文字留在按钮内，不压到相邻按钮边框。 */
+  #ch-compact .cmp-cam .cmp-btn { padding-left: 4px; padding-right: 4px; }
+
+  #ch-compact .cmp-hint { font-size: 9px; }
+}
+
+@media (max-width: 860px) {
+  #ch-compact .cmp-console {
+    left: 10px;
+    right: 10px;
+    top: 96px;
+    bottom: 10px;
+    width: auto;
+  }
+
+  #ch-compact .cmp-console-head { padding-bottom: 2px; }
+}
+
+/* ---------------- 动效降级 ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  #ch-compact .cmp-btn,
+  #ch-compact .cmp-obj,
+  #ch-compact .cmp-menu-item,
+  #ch-compact .cmp-swatch {
+    transition-duration: 0.01ms;
+  }
+
+  #ch-compact .cmp-btn:active { transform: none; }
+}
